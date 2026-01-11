@@ -8,15 +8,21 @@
 #include <stdio.h>
 
 #include "GContext/gcontext.h"
+#include "textrender.h"
 
 #include "VersionNum"
 
 int main(int argc, char *argv[])
 {
-
+    textrender_t *trender;
     gcontext_t *gcontext = gcontext_initvdu(1);
 
     gcontext->rectangle_fill(gcontext, 0x81397900, 64, 64, 500,500);
+
+    trender = textrender_init(gcontext);
+    textrender_setfont(trender);
+
+    textrender_paint(trender, 0x00000000, 0xFF888800, "Hello world", 64, 800);
 
     exit(EXIT_SUCCESS);
 }

@@ -1,0 +1,117 @@
+/*******************************************************************
+ * File:        textrender
+ * Purpose:     Rendering interface for the WindowManager
+ * Author:      Gerph
+ * Date:        11 Jan 2026
+ ******************************************************************/
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdint.h>
+
+#include "GContext/gcontext.h"
+#include "textrender.h"
+
+#define WIMP_FONTNAME_VAR "Wimp$Font"
+#define WIMP_FONTSIZE_VAR "Wimp$FontSize"
+#define WIMP_FONTWIDTH_VAR "Wimp$FontWidth"
+
+#define WIMP_FONTXSIZE (12 * 16)
+#define WIMP_FONTYSIZE (12 * 16)
+
+struct textrender_s {
+    gcontext_t *gcontext;
+    font_t font;
+};
+
+
+/*************************************************** Gerph *********
+ Function:      textrender_init
+ Description:   Initialise the text rendering system
+ Parameters:    gcontext-> the context we're using this render in
+ Returns:       text rendering object, or NULL if failed
+ ******************************************************************/
+textrender_t *textrender_init(gcontext_t *gcontext)
+{
+    textrender_t *trender = calloc(sizeof(*trender), 1);
+    if (trender == NULL)
+        return trender;
+    trender->gcontext = gcontext;
+    trender->font = NULL;
+    return trender;
+}
+
+
+/*************************************************** Gerph *********
+ Function:      textrender_setfont
+ Description:   Set the font for the text rendering operations
+ Parameters:    trender-> the rendering context
+ Returns:       none
+ ******************************************************************/
+void textrender_setfont(textrender_t *trender)
+{
+    const char *fontname = getenv(WIMP_FONTNAME_VAR);
+    font_t font;
+    if (fontname != NULL)
+    {
+        const char *size = getenv(WIMP_FONTSIZE_VAR);
+        int32_t xsize = WIMP_FONTXSIZE;
+        int32_t ysize = WIMP_FONTYSIZE;
+        if (size != NULL)
+        {
+            int value = atoi(size); /* Should this be an OS_ReadUnsigned? */
+            if (value > 0 && value < 256*16)
+            {
+                xsize = value;
+                ysize = value;
+            }
+        }
+        size = getenv(WIMP_FONTWIDTH_VAR);
+        if (size != NULL)
+        {
+            int value = atoi(size); /* Should this be an OS_ReadUnsigned? */
+            if (value > 0 && value < 256*16)
+            {
+                xsize = value;
+            }
+        }
+        /* There's only one buffer for getenv */
+        fontname = getenv(WIMP_FONTNAME_VAR);
+
+        font = trender->gcontext->text_findfont(trender->gcontext, fontname, xsize, ysize);
+        if (trender->font != FONT_NONE)
+        {
+            trender->gcontext->text_losefont(trender->gcontext, trender->font);
+        }
+        trender->font = font;
+    }
+    else
+    {
+        /* They didn't configure a font in the variable. Fall back to defaults */
+        /* FIXME: We should use the configured font here */
+        if (trender->font != FONT_NONE)
+        {
+            trender->gcontext->text_losefont(trender->gcontext, trender->font);
+        }
+        trender->font = FONT_NONE;
+    }
+}
+
+
+
+
+/*************************************************** Gerph *********
+ Function:      textrender_paint
+ Description:   Draw some simple text
+ Parameters:    trender-> the rendering context
+                bg, fg = colour to plot with
+                text-> string to render
+                x = position
+                y = position
+ Returns:       none
+ ******************************************************************/
+void textrender_paint(textrender_t *trender, uint32_t bg, uint32_t fg, const char *text, int x, int y)
+{
+    trender->gcontext->text_paint(trender->gcontext, trender->font,
+                                  x, y, bg, fg, text, -1);
+}

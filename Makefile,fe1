@@ -33,7 +33,8 @@ CDEFINES   =
 LIBS       = ${CLIB} C:GContext.o.libGContext
 
 # Objects to build, using the format o.<name> (will be varied for build type)
-OBJS       = o.main
+OBJS       = o.main \
+			 o.textrender
 
 # Space separated list of XML files for building documentation.
 #DOCSRC = <prm-in-xml-sources>

@@ -1,0 +1,44 @@
+/*******************************************************************
+ * File:        textrender
+ * Purpose:     Rendering interface for the WindowManager
+ * Author:      Gerph
+ * Date:        11 Jan 2026
+ ******************************************************************/
+
+#ifndef TEXTRENDER_H
+#define TEXTRENDER_H
+
+#include "GContext/gcontext.h"
+
+typedef struct textrender_s textrender_t;
+
+
+/*************************************************** Gerph *********
+ Function:      textrender_init
+ Description:   Initialise the text rendering system
+ Parameters:    gcontext-> the context we're using this render in
+ Returns:       text rendering object, or NULL if failed
+ ******************************************************************/
+textrender_t *textrender_init(gcontext_t *gcontext);
+
+/*************************************************** Gerph *********
+ Function:      textrender_setfont
+ Description:   Set the font for the text rendering operations
+ Parameters:    trender-> the rendering context
+ Returns:       none
+ ******************************************************************/
+void textrender_setfont(textrender_t *trender);
+
+/*************************************************** Gerph *********
+ Function:      textrender_paint
+ Description:   Draw some simple text
+ Parameters:    trender-> the rendering context
+                bg, fg = colour to plot with
+                text-> string to render
+                x = position
+                y = position
+ Returns:       none
+ ******************************************************************/
+void textrender_paint(textrender_t *trender, uint32_t bg, uint32_t fg, const char *text, int x, int y);
+
+#endif
