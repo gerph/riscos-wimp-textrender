@@ -8,10 +8,19 @@
 #ifndef TEXTRENDER_H
 #define TEXTRENDER_H
 
+#include <stdbool.h>
+
 #include "GContext/gcontext.h"
+
+#define FONTNAME_MAX (256)
 
 typedef struct textrender_s textrender_t;
 
+typedef struct desktopfont_s {
+    bool systemfont;
+    char fontname[FONTNAME_MAX];
+    uint32_t xsize, ysize;
+} desktopfont_t;
 
 /*************************************************** Gerph *********
  Function:      textrender_init

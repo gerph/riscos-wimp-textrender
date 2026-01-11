@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <string.h>
 
 #include "GContext/gcontext.h"
 #include "textrender.h"
@@ -41,6 +42,77 @@ textrender_t *textrender_init(gcontext_t *gcontext)
     return trender;
 }
 
+/*************************************************** Gerph *********
+ Function:      textrender_getdefaultfontname
+ Description:   Read the default font to use when no explicit font configured
+ Parameters:    trender-> the context
+ Returns:       font name, or NULL if using system font
+ ******************************************************************/
+const char *textrender_getdefaultfontname(textrender_t *trender)
+{
+    /* FIXME: Read the NVRAM configuration */
+    return NULL;
+}
+
+/*************************************************** Gerph *********
+ Function:      textrender_readfont
+ Description:   Read the font that should be used for this context
+ Parameters:    trender-> the rendering context
+                desktopfont-> where to populate the font to use
+ Returns:       none
+ ******************************************************************/
+void textrender_readfont(textrender_t *trender, desktopfont_t *desktopfont)
+{
+    const char *fontname = getenv(WIMP_FONTNAME_VAR);
+    const char *size;
+    int32_t xsize = WIMP_FONTXSIZE;
+    int32_t ysize = WIMP_FONTYSIZE;
+
+    desktopfont->fontname[0] = '\0';
+    desktopfont->systemfont = true;
+
+    /* Determine font name */
+    if (fontname != NULL)
+    {
+        strncpy(desktopfont->fontname, fontname, sizeof(desktopfont->fontname));
+        desktopfont->systemfont = false;
+    }
+    else
+    {
+        /* Read font from NVRAM */
+        fontname = textrender_getdefaultfontname(trender);
+        if (fontname != NULL)
+        {
+            strncpy(desktopfont->fontname, fontname, sizeof(desktopfont->fontname));
+            desktopfont->systemfont = false;
+        }
+    }
+
+    /* Determine font size */
+    size = getenv(WIMP_FONTSIZE_VAR);
+    if (size != NULL)
+    {
+        int value = atoi(size); /* Should this be an OS_ReadUnsigned? */
+        if (value > 0 && value < 256*16)
+        {
+            xsize = value;
+            ysize = value;
+        }
+    }
+    size = getenv(WIMP_FONTWIDTH_VAR);
+    if (size != NULL)
+    {
+        int value = atoi(size); /* Should this be an OS_ReadUnsigned? */
+        if (value > 0 && value < 256*16)
+        {
+            xsize = value;
+        }
+    }
+
+    desktopfont->xsize = xsize;
+    desktopfont->ysize = ysize;
+}
+
 
 /*************************************************** Gerph *********
  Function:      textrender_setfont
@@ -50,54 +122,20 @@ textrender_t *textrender_init(gcontext_t *gcontext)
  ******************************************************************/
 void textrender_setfont(textrender_t *trender)
 {
-    const char *fontname = getenv(WIMP_FONTNAME_VAR);
-    font_t font;
-    if (fontname != NULL)
+    desktopfont_t dtf;
+    textrender_readfont(trender, &dtf);
+    if (trender->font != FONT_NONE)
     {
-        const char *size = getenv(WIMP_FONTSIZE_VAR);
-        int32_t xsize = WIMP_FONTXSIZE;
-        int32_t ysize = WIMP_FONTYSIZE;
-        if (size != NULL)
-        {
-            int value = atoi(size); /* Should this be an OS_ReadUnsigned? */
-            if (value > 0 && value < 256*16)
-            {
-                xsize = value;
-                ysize = value;
-            }
-        }
-        size = getenv(WIMP_FONTWIDTH_VAR);
-        if (size != NULL)
-        {
-            int value = atoi(size); /* Should this be an OS_ReadUnsigned? */
-            if (value > 0 && value < 256*16)
-            {
-                xsize = value;
-            }
-        }
-        /* There's only one buffer for getenv */
-        fontname = getenv(WIMP_FONTNAME_VAR);
-
-        font = trender->gcontext->text_findfont(trender->gcontext, fontname, xsize, ysize);
-        if (trender->font != FONT_NONE)
-        {
-            trender->gcontext->text_losefont(trender->gcontext, trender->font);
-        }
-        trender->font = font;
-    }
-    else
-    {
-        /* They didn't configure a font in the variable. Fall back to defaults */
-        /* FIXME: We should use the configured font here */
-        if (trender->font != FONT_NONE)
-        {
-            trender->gcontext->text_losefont(trender->gcontext, trender->font);
-        }
+        trender->gcontext->text_losefont(trender->gcontext, trender->font);
         trender->font = FONT_NONE;
     }
+    if (dtf.systemfont)
+    {
+        font_t font;
+        font = trender->gcontext->text_findfont(trender->gcontext, dtf.fontname, dtf.xsize, dtf.ysize);
+        trender->font = font;
+    }
 }
-
-
 
 
 /*************************************************** Gerph *********
