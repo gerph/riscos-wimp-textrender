@@ -26,6 +26,15 @@ struct textrender_s {
 };
 
 
+#define DEBUG
+
+#ifdef DEBUG
+#define dprintf if (1) printf
+#else
+#define dprintf if (0) printf
+#endif
+
+
 /*************************************************** Gerph *********
  Function:      textrender_init
  Description:   Initialise the text rendering system
@@ -111,6 +120,8 @@ void textrender_readfont(textrender_t *trender, desktopfont_t *desktopfont)
 
     desktopfont->xsize = xsize;
     desktopfont->ysize = ysize;
+    dprintf("textrender_readfont(): %s, at %i x %i\n", desktopfont->systemfont ? "SYSTEM" : desktopfont->fontname,
+                                                       desktopfont->xsize, desktopfont->ysize);
 }
 
 
@@ -129,7 +140,7 @@ void textrender_setfont(textrender_t *trender)
         trender->gcontext->text_losefont(trender->gcontext, trender->font);
         trender->font = FONT_NONE;
     }
-    if (dtf.systemfont)
+    if (! dtf.systemfont)
     {
         font_t font;
         font = trender->gcontext->text_findfont(trender->gcontext, dtf.fontname, dtf.xsize, dtf.ysize);
@@ -152,4 +163,31 @@ void textrender_paint(textrender_t *trender, uint32_t bg, uint32_t fg, const cha
 {
     trender->gcontext->text_paint(trender->gcontext, trender->font,
                                   x, y, bg, fg, text, -1);
+}
+
+
+/*************************************************** Gerph *********
+ Function:      textrender_stringwidth
+ Description:   Read the width of a string on screen (Wimp_TextOp 1-like)
+ Parameters:    trender-> the rendering context
+                text-> string to size, ctrl terminated)
+                len = the length of the string (or <=0 for whole string)
+ Returns:       the width in OS units
+ ******************************************************************/
+int32_t textrender_stringwidth(textrender_t *trender, const char *text, int len)
+{
+    int32_t width;
+    stringbounds_t bounds;
+    if (len == 0)
+        len = -1;
+    /* FIXME: text should be control terminated, but getstringsize treats it as 0-terminated */
+    trender->gcontext->text_getstringsize(trender->gcontext, trender->font,
+                                          &bounds, 0x7FFFFFFF,
+                                          text, len, -1);
+    if (bounds.rbearing > bounds.xoffset)
+        width = bounds.rbearing;
+    else
+        width = bounds.xoffset;
+
+    return width;
 }

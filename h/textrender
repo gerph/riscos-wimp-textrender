@@ -50,4 +50,14 @@ void textrender_setfont(textrender_t *trender);
  ******************************************************************/
 void textrender_paint(textrender_t *trender, uint32_t bg, uint32_t fg, const char *text, int x, int y);
 
+/*************************************************** Gerph *********
+ Function:      textrender_stringwidth
+ Description:   Read the width of a string on screen (Wimp_TextOp 1-like)
+ Parameters:    trender-> the rendering context
+                text-> string to size, ctrl terminated)
+                len = the length of the string (or <=0 for whole string)
+ Returns:       the width in OS units
+ ******************************************************************/
+int32_t textrender_stringwidth(textrender_t *trender, const char *text, int len);
+
 #endif

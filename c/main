@@ -22,7 +22,14 @@ int main(int argc, char *argv[])
     trender = textrender_init(gcontext);
     textrender_setfont(trender);
 
-    textrender_paint(trender, 0x00000000, 0xFF888800, "Hello world", 64, 800);
+    {
+        const char *msg = "Hello world!";
+        int width = textrender_stringwidth(trender, msg, 0);
+        textrender_paint(trender, 0x00000000, 0x8888FF00, msg, 64, 800);
+        gcontext->line_start(gcontext, 0x88000000);
+        gcontext->line_line(gcontext, 64, 800, 64+width, 800);
+        gcontext->line_end(gcontext);
+    }
 
     exit(EXIT_SUCCESS);
 }
