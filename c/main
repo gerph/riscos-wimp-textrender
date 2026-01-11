@@ -1,18 +1,22 @@
 /*******************************************************************
  * File:        main
  * Purpose:     WimpTextRender command line tool
- * Author:      YOUR NAME
+ * Author:      Gerph
  ******************************************************************/
 
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "GContext/gcontext.h"
+
 #include "VersionNum"
 
 int main(int argc, char *argv[])
 {
-    printf("WimpTextRender " Module_FullVersionAndDate "\n");
-    printf("Syntax: *WimpTextRender\n");
+
+    gcontext_t *gcontext = gcontext_initvdu(1);
+
+    gcontext->rectangle_fill(gcontext, 0x81397900, 64, 64, 500,500);
 
     exit(EXIT_SUCCESS);
 }
