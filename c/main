@@ -23,7 +23,20 @@ int main(int argc, char *argv[])
     textrender_setfont(trender);
 
     {
-        const char *msg = "Hello world!";
+        const char *msg = "Hello world! \x80\x81\x82\x83\x84\x85\x88\x89\x8a\x8b\x98";
+        /*
+    Symbol_Tick             = 0x80
+    Symbol_NotMaximised     = 0x81
+    Symbol_Maximised        = 0x82
+    Symbol_Resize           = 0x83
+    Symbol_Close            = 0x84
+    Symbol_Back             = 0x85
+    Symbol_Left             = 0x88
+    Symbol_Right            = 0x89
+    Symbol_Down             = 0x8A
+    Symbol_Up               = 0x8B
+    Symbol_Iconise          = 0x98
+        */
         int width = textrender_stringwidth(trender, msg, 0);
         textrender_setcolours(trender, 0x00000000, 0x8888FF00);
         textrender_paint(trender, msg, 64, 800);

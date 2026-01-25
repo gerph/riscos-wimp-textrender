@@ -12,6 +12,7 @@
 
 #include "GContext/gcontext.h"
 #include "textrender.h"
+#include "wimpsymbol.h"
 
 #define WIMP_FONTNAME_VAR "Wimp$Font"
 #define WIMP_FONTSIZE_VAR "Wimp$FontSize"
@@ -26,6 +27,7 @@
 struct textrender_s {
     gcontext_t *gcontext;
     font_t font;
+    font_t wimpsymbol;
     colour_t fg, bg;
 };
 
@@ -51,9 +53,10 @@ textrender_t *textrender_init(gcontext_t *gcontext)
     if (trender == NULL)
         return trender;
     trender->gcontext = gcontext;
-    trender->font = NULL;
+    trender->font = FONT_NONE;
     trender->fg = DEFAULT_FG;
     trender->bg = DEFAULT_BG;
+    trender->wimpsymbol = FONT_NONE;
     return trender;
 }
 
@@ -152,6 +155,9 @@ void textrender_setfont(textrender_t *trender)
         font = trender->gcontext->text_findfont(trender->gcontext, dtf.fontname, dtf.xsize, dtf.ysize);
         trender->font = font;
     }
+
+    /* Setup the wimp symbol font */
+    trender->wimpsymbol = trender->gcontext->text_findfont(trender->gcontext, "WimpSymbol", dtf.xsize, dtf.ysize);
 }
 
 
@@ -180,9 +186,13 @@ void textrender_setcolours(textrender_t *trender, colour_t bg, colour_t fg)
  ******************************************************************/
 void textrender_paint(textrender_t *trender, const char *text, int x, int y)
 {
+    const char *newtext = wimpsymbol_convert(text,
+                                             trender->gcontext->text_readhandle(trender->gcontext, trender->wimpsymbol),
+                                             trender->gcontext->text_readhandle(trender->gcontext, trender->font));
     trender->gcontext->text_paint(trender->gcontext, trender->font,
                                   x, y, trender->bg, trender->fg,
-                                  text, -1);
+                                  newtext, -1);
+    wimpsymbol_free(newtext);
 }
 
 
@@ -200,14 +210,21 @@ int32_t textrender_stringwidth(textrender_t *trender, const char *text, int len)
     stringbounds_t bounds;
     if (len == 0)
         len = -1;
-    /* FIXME: text should be control terminated, but getstringsize treats it as 0-terminated */
-    trender->gcontext->text_getstringsize(trender->gcontext, trender->font,
-                                          &bounds, 0x7FFFFFFF,
-                                          text, len, -1);
-    if (bounds.rbearing > bounds.xoffset)
-        width = bounds.rbearing;
-    else
-        width = bounds.xoffset;
+    {
+        /* FIXME Length not handled in symbol conversion */
+        const char *newtext = wimpsymbol_convert(text,
+                                                 trender->gcontext->text_readhandle(trender->gcontext, trender->wimpsymbol),
+                                                 trender->gcontext->text_readhandle(trender->gcontext, trender->font));
+        /* FIXME: text should be control terminated, but getstringsize treats it as 0-terminated */
+        trender->gcontext->text_getstringsize(trender->gcontext, trender->font,
+                                              &bounds, 0x7FFFFFFF,
+                                              newtext, len, -1);
+        if (bounds.rbearing > bounds.xoffset)
+            width = bounds.rbearing;
+        else
+            width = bounds.xoffset;
+        wimpsymbol_free(newtext);
+    }
 
     return width;
 }

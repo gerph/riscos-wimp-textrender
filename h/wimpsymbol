@@ -1,0 +1,29 @@
+/*******************************************************************
+ * File:        wimpsymbol
+ * Purpose:     Translations of text from regular strings to use Wimp Symbol
+ * Author:      Gerph
+ * Date:        25 Jan 2026
+ ******************************************************************/
+
+#ifndef WIMPSYMBOL_H
+#define WIMPSYMBOL_H
+
+/*************************************************** Gerph *********
+ Function:      wimpsymbol_free
+ Description:   Free a WimpSymbol string that was allocated by wimpsymbol_convert
+ Parameters:    symbolstring -> converted text
+ Returns:       none
+ ******************************************************************/
+void wimpsymbol_free(const char *symbolstring);
+
+/*************************************************** Gerph *********
+ Function:      wimpsymbol_convert
+ Description:   Convert a string to one using wimp symbols
+ Parameters:    text-> the text string we are converting
+ Returns:       pointer to a new string (or the same one) that we can use in FontManager.
+ ******************************************************************/
+const char *wimpsymbol_convert(const char *text,
+                               int wimpsymbolfont,
+                               int regularfont);
+
+#endif

@@ -1,0 +1,148 @@
+/*******************************************************************
+ * File:        wimpsymbol
+ * Purpose:     Translations of text from regular strings to use Wimp Symbol
+ * Author:      Gerph
+ * Date:        25 Jan 2026
+ ******************************************************************/
+
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "wimpsymbol.h"
+
+#define DEBUG
+
+#ifdef DEBUG
+#define dprintf if (1) printf
+#else
+#define dprintf if (0) printf
+#endif
+
+typedef struct symbolstring_s {
+    char *string;
+    int maxlen;
+} symbolstring_t;
+
+
+static symbolstring_t ss;
+
+/*************************************************** Gerph *********
+ Function:      wimpsymbol_free
+ Description:   Free a WimpSymbol string that was allocated by wimpsymbol_convert
+ Parameters:    symbolstring -> converted text
+ Returns:       none
+ ******************************************************************/
+void wimpsymbol_free(const char *symbolstring)
+{
+    /* Nothing to do, because the symbol is static. */
+    return;
+}
+
+/*************************************************** Gerph *********
+ Function:      wimpsymbol_convert
+ Description:   Convert a string to one using wimp symbols
+ Parameters:    text-> the text string we are converting
+ Returns:       pointer to a new string (or the same one) that we can use in FontManager.
+ ******************************************************************/
+const char *wimpsymbol_convert(const char *text,
+                               int wimpsymbolfont,
+                               int regularfont)
+{
+    /* FIXME: Add length parameter */
+    const char *p;
+    for (p=text; *p >= 32; p++)
+    {
+        if (*p >= 0x80 && *p <= 0x9F)
+            goto needs_conversion;
+    }
+    dprintf("No conversion required\n");
+    return text;
+
+needs_conversion:
+    {
+#define BYTES_PER_FONT_CHANGE (2)
+#define FONTCHAR_CHANGEFONT   (26)
+        int need;
+        int extra = BYTES_PER_FONT_CHANGE;
+        bool in_wimpsymbol = true;
+        char *out;
+
+        dprintf("String needs wimpsymbol applying, ok up to '%.*s'\n", p-text, text);
+        for (; *p >= 32; p++)
+        {
+            if (*p >= 0x80 && *p <= 0x9F)
+            {
+                if (!in_wimpsymbol)
+                {
+                    extra += BYTES_PER_FONT_CHANGE;
+                    in_wimpsymbol = true;
+                }
+            }
+            else
+            {
+                if (in_wimpsymbol)
+                {
+                    extra += BYTES_PER_FONT_CHANGE;
+                    in_wimpsymbol = false;
+                }
+            }
+        }
+
+        need = (p - text) + 1 + extra;
+
+        if (ss.maxlen < need)
+        {
+            /* We need a larger buffer to put this string into */
+            char *oldstring = ss.string;
+            dprintf("Reallocating buffer: need %i bytes\n", need);
+            ss.maxlen = 0;
+            ss.string = NULL;
+            free(oldstring);
+            ss.maxlen = (need + 1023) & ~1023;
+            ss.string = malloc(ss.maxlen);
+            if (ss.string == NULL)
+            {
+                dprintf("Ran out of memory - panic return of original string\n");
+                return text; /* If we ran out of memory, just plot the text directly - worst case it'll display symbols wrongly */
+            }
+        }
+
+        /* Copy the string, with symbols using font change */
+        in_wimpsymbol = false;
+        out = (char*)ss.string;
+        dprintf("Converting string: ");
+        for (p=text; *p >= 32;)
+        {
+            char c = *p++;
+            if (c >= 0x80 && c <= 0x9F)
+            {
+                if (!in_wimpsymbol)
+                {
+                    *out++ = FONTCHAR_CHANGEFONT;
+                    *out++ = wimpsymbolfont;
+                    dprintf("<symbols>");
+                    in_wimpsymbol = true;
+                }
+            }
+            else
+            {
+                if (in_wimpsymbol)
+                {
+                    *out++ = FONTCHAR_CHANGEFONT;
+                    *out++ = regularfont;
+                    dprintf("<regular>");
+                    in_wimpsymbol = false;
+                }
+            }
+            *out++ = c;
+            dprintf("%c", c);
+        }
+
+        /* Terminate our string */
+        *out++ = '\0';
+        dprintf("\n");
+    }
+
+    return ss.string;
+}
