@@ -15,9 +15,6 @@
 
 #define FONTNAME_MAX (256)
 
-/* FIXME: This should move into GContext */
-typedef uint32_t colour_t;
-
 typedef struct textrender_s textrender_t;
 
 typedef struct desktopfont_s {

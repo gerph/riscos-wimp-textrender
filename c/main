@@ -15,7 +15,7 @@
 int main(int argc, char *argv[])
 {
     textrender_t *trender;
-    gcontext_t *gcontext = gcontext_initvdu(1);
+    gcontext_t *gcontext = gcontext_initvdu(2);
 
     gcontext->rectangle_fill(gcontext, 0x81397900, 64, 64, 500,500);
 
