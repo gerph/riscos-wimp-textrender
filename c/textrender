@@ -155,12 +155,8 @@ void textrender_setfont(textrender_t *trender)
         trender->gcontext->text_losefont(trender->gcontext, trender->font);
         trender->font = FONT_NONE;
     }
-    if (! dtf.systemfont)
-    {
-        font_t font;
-        font = trender->gcontext->text_findfont(trender->gcontext, dtf.fontname, dtf.xsize, dtf.ysize);
-        trender->font = font;
-    }
+
+    trender->font = trender->gcontext->text_findfont(trender->gcontext, dtf.systemfont ? "" : dtf.fontname, dtf.xsize, dtf.ysize);
 
     /* Setup the wimp symbol font */
     trender->wimpsymbol = trender->gcontext->text_findfont(trender->gcontext, "WimpSymbol", dtf.xsize, dtf.ysize);

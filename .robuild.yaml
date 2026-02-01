@@ -30,12 +30,23 @@ jobs:
       - echo C path is <C$Path>
 
       - echo
-      - echo *** Build the component ***
+      - echo *** Build the command line test ***
       - amu -f Makefile install INSTDIR=Install
 
       - echo
-      - echo *** Run command ***
+      - echo *** Build the test module ***
+      - amu -f MakefileMod ram
+
+      - echo
+      - echo *** Run command to check it doesn't crash ***
       - aif32.WimpTextRender
+
+      - echo
+      - echo *** Load module to check it doesn't crash ***
+      - RMLoad rm32.WimpTextRender
+
+      - echo *** Copy the module into the Install directory
+      - Copy rm32.WimpTextRender Install.WimpTextRenderMod ~C~V
 
       - echo
       - echo *** SUCCESS ***

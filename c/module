@@ -1,0 +1,156 @@
+/*******************************************************************
+ * File:        module
+ * Purpose:     WimpTextRender module interface
+ * Author:      YOUR NAME
+ ******************************************************************/
+
+#include <stdlib.h>
+#include <stdio.h>
+
+#include "kernel.h"
+#include "modhead.h"
+
+#include "textop.h"
+#include "vdu5chars.h"
+#include "textrender.h"
+
+#define DEBUG
+
+#ifdef DEBUG
+#define dprintf if (1) printf
+#else
+#define dprintf if (0) printf
+#endif
+
+textrender_t *trender;
+
+/***************************************************************************
+ * Function:     Mod_Init
+ * Description:  Initialise the module, setting up vectors, callbacks and
+ *               any other parts of the system necessary for the module to
+ *               function.
+ * Parameters:   tail        = pointer to command line (control terminated)
+ *               podule_base = address of podule module was started from, or
+ *                             NULL if none
+ *               pw          = private word for module
+ * On exit:      Return NULL for successful initialisation, or a pointer to
+ *               an error block if the module could not start properly.
+ **************************************************************************/
+_kernel_oserror *Mod_Init(const char *tail, int podule_base, void *pw)
+{
+    gcontext_t *gcontext = gcontext_initvdu(2);
+
+    trender = textrender_init(gcontext);
+    textrender_setfont(trender);
+
+    vdu5chars_define();
+
+    dprintf("Module WimpTextRender initialised\n");
+    return NULL;
+}
+
+
+/***************************************************************************
+ * Function:     Mod_Final
+ * Description:  Finalise the module, shutting down any systems necessary,
+ *               freeing vectors and releasing workspace
+ * Parameters:   fatal       = fatality indicator; 1 if fatal, 0 if
+ *                             reinitialising
+ *               podule_base = address of podule module was started from, or
+ *                             NULL if none
+ *               pw          = private word for module
+ * On exit:      Return 0 for successful finalisation, or a pointer to an
+ *               error block if module was not shutdown properly.
+ **************************************************************************/
+_kernel_oserror *Mod_Final(int fatal, int podule_base, void *pw)
+{
+    dprintf("Module WimpTextRender dying\n");
+    /* FIXME: Call trender finalise to lose fonts and gcontext */
+    return NULL;
+}
+
+
+/***************************************************************************
+ * Description:  SWI handler routine. All SWIs for this module will be
+ *               passed to these routines.
+ * Parameters:   number = SWI number within SWI chunk (i.e. 0 to 63)
+ *               r      = pointer to register block on entry
+ *               pw     = private word for module
+ * On exit:      Return NULL if SWI handled successfully, setting return
+ *               register values (r0-r9) in r.
+ *               Return error_BAD_SWI for out of range SWIs.
+ *               Return an error block for a custom error.
+ **************************************************************************/
+/* Functions called to handle particular SWI calls */
+_kernel_oserror *SWI_TextOp(int number, _kernel_swi_regs *r, void *pw)
+{
+    /* Implements Wimp_TextOp */
+    _kernel_oserror *err = err_NotImplemented;
+    int reason = r->r[0] & 0xFF;
+    switch (reason)
+    {
+        case WimpTextOp_SetTextColour:
+            /* => R0 = 0 (reason code)
+                  R1 = foreground colour (&BBGGRR00)
+                  R2 = background colour (&BBGGRR00)
+
+               <= R0 corrupted
+                  R1, R2 preserved
+              */
+            textrender_setcolours(trender, r->r[2], r->r[1]);
+            err = NULL;
+            break;
+
+        case WimpTextOp_TextWidth:
+            /* => R0 = 1 (reason code)
+                  R1 = pointer to control character terminated string
+                  R2 = number of characters to include, or 0 for whole string
+
+               <= R0 = width of string for current font, in OS units
+                  R1, R2 preserved
+              */
+            {
+                const char *msg = (char*)r->r[1];
+                int max = r->r[2];
+                int width = textrender_stringwidth(trender, msg, max);
+                r->r[0] = width;
+                err = NULL;
+            }
+            break;
+
+        case WimpTextOp_RenderText:
+            /* => R0 = reason code and flags:
+                        bits 0-7 = 2 (reason code)
+                        bits 8-29 reserved (must be zero)
+                        bit 30 set => vertically justify text so baseline matches that of system font
+                        bit 31 set => right justify text to position given by R4 and R5
+                  R1 = pointer to null terminated string
+                  R2, R3 reserved (must be -1)
+                  R4 = bottom left x coordinate, in screen OS units
+                  R5 = bottom left y coordinate, in screen OS units
+               <= R0 corrupted
+                  R1 - R5 preserved
+             */
+            {
+                uint32_t flags = r->r[0] &~0xFF;
+                const char *msg = (const char *)r->r[1];
+                int x = r->r[4];
+                int y = r->r[5];
+                if (flags != 0)
+                    return err_NotImplemented;
+                textrender_paint(trender, msg, x, y);
+                err = NULL;
+            }
+            break;
+
+        case WimpTextOp_GetSplitPoint:
+            break;
+
+        case WimpTextOp_TruncateWithEllipsis:
+            break;
+
+        default:
+            break;
+    }
+    return err;
+}

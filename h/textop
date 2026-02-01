@@ -1,0 +1,24 @@
+/*******************************************************************
+ * File:        textop
+ * Purpose:     Definitions for the Wimp_TextOp
+ * Author:      Gerph
+ * Date:        01 Feb 2026
+ ******************************************************************/
+
+#ifndef TEXTOP_H
+#define TEXTOP_H
+
+#define WimpTextOp_SetTextColour        (0)
+#define WimpTextOp_TextWidth            (1)
+#define WimpTextOp_RenderText           (2)
+#define WimpTextOp_GetSplitPoint        (3)
+#define WimpTextOp_TruncateWithEllipsis (4)
+
+#define WimpTextOp_RightJustify         (1 << 31)
+#define WimpTextOp_VerticalJustify      (1 << 30)
+#define WimpTextOp_Offset               (1 << 29)
+#define WimpTextOp_VerticalCentre       (1 << 28)
+#define WimpTextOp_Style                (1 << 27)
+#define WimpTextOp_ReturnBBox           (1 << 31)
+
+#endif
