@@ -1,0 +1,56 @@
+/*******************************************************************
+ * File:        textrender_nvram
+ * Purpose:     NVRAM configuration of the fonts to use in the desktop
+ * Author:      Gerph
+ * Date:        01 Feb 2026
+ ******************************************************************/
+
+#ifndef TEXTRENDER_NVRAM_H
+#define TEXTRENDER_NVRAM_H
+
+#include "textrender.h"
+
+#define FONT_CONFIG_WIMPFONT     (0)
+#define FONT_CONFIG_SYSTEMFONT   (1)
+/* All the others are ROM fonts */
+
+/* Note: Move these when we do more with NVRAM */
+
+/*************************************************** Gerph *********
+ Function:      nvram_read
+ Description:   Read a value from the configuration
+ Parameters:    var = the NVRAM variable to read
+                default_value = the value to return if invalid
+ Returns:       value
+ ******************************************************************/
+int nvram_read(int var, int default_value);
+
+
+/*************************************************** Gerph *********
+ Function:      nvram_write
+ Description:   Write a value to the configuration
+ Parameters:    var = the NVRAM variable to read
+                value = value to write
+ Returns:       0 if successful, 1 if failed
+ ******************************************************************/
+int nvram_write(int var, int value);
+
+
+/*************************************************** Gerph *********
+ Function:      textrender_getfontconfig
+ Description:   Read the configured font to use
+ Parameters:    trender-> the context
+ Returns:       font configuration value
+ ******************************************************************/
+int textrender_getfontconfig(textrender_t *trender);
+
+/*************************************************** Gerph *********
+ Function:      textrender_getromfontname
+ Description:   Read the font from a configuration
+ Parameters:    font_config = value from font config
+ Returns:       font name, or NULL if using system font
+ ******************************************************************/
+const char *textrender_getromfontname(int font_config);
+
+
+#endif

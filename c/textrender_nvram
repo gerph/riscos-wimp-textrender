@@ -1,0 +1,131 @@
+/*******************************************************************
+ * File:        textrender_nvram
+ * Purpose:     NVRAM configuration of the fonts to use in the desktop
+ * Author:      Gerph
+ * Date:        01 Feb 2026
+ ******************************************************************/
+
+#include <string.h>
+
+#include "swis.h"
+
+#include "riscos/CMOS.h"
+
+#include "textrender_nvram.h"
+
+/* Definition from the Hdr:CMOS file */
+
+/*
+DesktopFeaturesCMOS # 1     ; &8C Desktop features
+                            ; Contains flags which indicate various features available within
+                            ; the desktop, such as 3D or not 3D and things to do with the Wimp.
+                            ;
+                            ; bit 0 =0 => Standard RISC OS 2.00 look for desktop
+                            ;       =1 => Apply 3D look to windows / icons
+                            ; bits 1-4 -  Desktop font setting, where
+                            ;       =0 => use Wimp$Font... variables
+                            ;       =1 => use system font
+                            ;    =2-15 => use font number n from ResourceFS
+                            ; bits 5-6    Reserved for Acorn use
+                            ; Ursula        bit 5   WimpSpritePrecedence
+                            ;                   6   WimpButtonType
+                            ; bit 7 =0 => use tile_1 for window background
+                            ;       =1 => not tiled (use grey 1)
+
+desktopfeaturebit_3D            *  1:SHL:0
+desktopfontbits                 * 15:SHL:1
+desktopwimpspriteprotection     *  1:SHL:5
+desktopwimpbuttontype           *  1:SHL:6
+desktopwindowtile               *  1:SHL:7
+*/
+
+
+/*************************************************** Gerph *********
+ Function:      nvram_read
+ Description:   Read a value from the configuration
+ Parameters:    var = the NVRAM variable to read
+                default_value = the value to return if invalid
+ Returns:       value
+ ******************************************************************/
+int nvram_read(int var, int default_value)
+{
+    int value = 0;
+    _kernel_oserror *err = _swix(OS_Byte, _INR(0, 1)|_OUT(2), ReadCMOS, var, &value);
+    if (err)
+        return default_value;
+    return value;
+}
+
+
+/*************************************************** Gerph *********
+ Function:      nvram_write
+ Description:   Write a value to the configuration
+ Parameters:    var = the NVRAM variable to read
+                value = value to write
+ Returns:       0 if successful, 1 if failed
+ ******************************************************************/
+int nvram_write(int var, int value)
+{
+    _kernel_oserror *err = _swix(OS_Byte, _INR(0, 2), WriteCMOS, var, value);
+    if (err)
+        return 1;
+    return 0;
+}
+
+
+static const char fontnames[] =
+"\0" /* Wimp$Font - already handled */
+"\0" /* System font - already handled */
+"Corpus.Bold\0"
+"Corpus.Bold.Oblique\0"
+"Corpus.Medium\0"
+"Corpus.Medium.Oblique\0"
+"Homerton.Bold\0"
+"Homerton.Bold.Oblique\0"
+"Homerton.Medium\0"
+"Homerton.Medium.Oblique\0"
+"Sidney\0"
+"Trinity.Bold\0"
+"Trinity.Bold.Italic\0"
+"Trinity.Medium\0"
+"Trinity.Medium.Italic\0"
+"WIMPSymbol\0";
+
+
+/*************************************************** Gerph *********
+ Function:      textrender_getfontconfig
+ Description:   Read the configured font to use
+ Parameters:    trender-> the context
+ Returns:       font configuration value
+ ******************************************************************/
+int textrender_getfontconfig(textrender_t *trender)
+{
+    /* Read the NVRAM configuration */
+    int fontvalue = (nvram_read(DesktopFeaturesCMOS, 0) & desktopfontbits) >> 1;
+    return fontvalue;
+}
+
+
+/*************************************************** Gerph *********
+ Function:      textrender_getromfontname
+ Description:   Read the font from a configuration
+ Parameters:    font_config = value from font config
+ Returns:       font name, or NULL if using system font
+ ******************************************************************/
+const char *textrender_getromfontname(int font_config)
+{
+    /* Find the font to use in our list */
+    const char *name = fontnames;
+    if (font_config > 15)
+        font_config = 0;
+    while (font_config > 0)
+    {
+        name += strlen(name) + 1;
+        font_config--;
+    }
+    if (*name == '\0')
+        return NULL;
+    return name;
+}
+
+

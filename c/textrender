@@ -12,6 +12,7 @@
 
 #include "GContext/gcontext.h"
 #include "textrender.h"
+#include "textrender_nvram.h"
 #include "wimpsymbol.h"
 
 #define WIMP_FONTNAME_VAR "Wimp$Font"
@@ -63,18 +64,6 @@ textrender_t *textrender_init(gcontext_t *gcontext)
 }
 
 /*************************************************** Gerph *********
- Function:      textrender_getdefaultfontname
- Description:   Read the default font to use when no explicit font configured
- Parameters:    trender-> the context
- Returns:       font name, or NULL if using system font
- ******************************************************************/
-const char *textrender_getdefaultfontname(textrender_t *trender)
-{
-    /* FIXME: Read the NVRAM configuration */
-    return NULL;
-}
-
-/*************************************************** Gerph *********
  Function:      textrender_readfont
  Description:   Read the font that should be used for this context
  Parameters:    trender-> the rendering context
@@ -83,49 +72,64 @@ const char *textrender_getdefaultfontname(textrender_t *trender)
  ******************************************************************/
 void textrender_readfont(textrender_t *trender, desktopfont_t *desktopfont)
 {
-    const char *fontname = getenv(WIMP_FONTNAME_VAR);
+    const char *fontname;
     const char *size;
     int32_t xsize = WIMP_FONTXSIZE;
     int32_t ysize = WIMP_FONTYSIZE;
+    int font_config = textrender_getfontconfig(trender);
 
-    desktopfont->fontname[0] = '\0';
-    desktopfont->systemfont = true;
+    if (font_config == FONT_CONFIG_WIMPFONT ||
+        font_config == FONT_CONFIG_SYSTEMFONT)
+    {
+        if (font_config == FONT_CONFIG_SYSTEMFONT)
+            fontname = NULL;
+        else
+            fontname = getenv(WIMP_FONTNAME_VAR);
 
-    /* Determine font name */
-    if (fontname != NULL)
-    {
-        strncpy(desktopfont->fontname, fontname, sizeof(desktopfont->fontname));
-        desktopfont->systemfont = false;
-    }
-    else
-    {
-        /* Read font from NVRAM */
-        fontname = textrender_getdefaultfontname(trender);
-        if (fontname != NULL)
+        if (fontname == NULL)
+        {
+            desktopfont->fontname[0] = '\0';
+            desktopfont->systemfont = true;
+        }
+        else
         {
             strncpy(desktopfont->fontname, fontname, sizeof(desktopfont->fontname));
             desktopfont->systemfont = false;
         }
-    }
 
-    /* Determine font size */
-    size = getenv(WIMP_FONTSIZE_VAR);
-    if (size != NULL)
-    {
-        int value = atoi(size); /* Should this be an OS_ReadUnsigned? */
-        if (value > 0 && value < 256*16)
+        /* Determine font size */
+        size = getenv(WIMP_FONTSIZE_VAR);
+        if (size != NULL)
         {
-            xsize = value;
-            ysize = value;
+            int value = atoi(size); /* Should this be an OS_ReadUnsigned? */
+            if (value > 0 && value < 256*16)
+            {
+                xsize = value;
+                ysize = value;
+            }
+        }
+        size = getenv(WIMP_FONTWIDTH_VAR);
+        if (size != NULL)
+        {
+            int value = atoi(size); /* Should this be an OS_ReadUnsigned? */
+            if (value > 0 && value < 256*16)
+            {
+                xsize = value;
+            }
         }
     }
-    size = getenv(WIMP_FONTWIDTH_VAR);
-    if (size != NULL)
+    else
     {
-        int value = atoi(size); /* Should this be an OS_ReadUnsigned? */
-        if (value > 0 && value < 256*16)
+        fontname = textrender_getromfontname(font_config);
+        if (fontname == NULL)
         {
-            xsize = value;
+            desktopfont->fontname[0] = '\0';
+            desktopfont->systemfont = false;
+        }
+        else
+        {
+            strncpy(desktopfont->fontname, fontname, sizeof(desktopfont->fontname));
+            desktopfont->systemfont = false;
         }
     }
 
