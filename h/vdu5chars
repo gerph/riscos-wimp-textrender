@@ -1,0 +1,19 @@
+/*******************************************************************
+ * File:        vdu5chars
+ * Purpose:     Definition of the user definable characters for the Wimp
+ * Author:      Gerph
+ * Date:        01 Feb 2026
+ ******************************************************************/
+
+#ifndef VDU5CHARS_H
+#define VDU5CHARS_H
+
+/*************************************************** Gerph *********
+ Function:      vdu5chars_define
+ Description:   Define all the VDU5 character for the Wimp
+ Parameters:    none
+ Returns:       none
+ ******************************************************************/
+void vdu5chars_define(void);
+
+#endif

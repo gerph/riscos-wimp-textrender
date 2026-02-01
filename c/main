@@ -9,6 +9,7 @@
 
 #include "GContext/gcontext.h"
 #include "textrender.h"
+#include "vdu5chars.h"
 
 #include "VersionNum"
 
@@ -16,6 +17,8 @@ int main(int argc, char *argv[])
 {
     textrender_t *trender;
     gcontext_t *gcontext = gcontext_initvdu(2);
+
+    vdu5chars_define();
 
     gcontext->rectangle_fill(gcontext, 0x81397900, 64, 64, 500,500);
 

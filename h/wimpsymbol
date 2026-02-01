@@ -8,6 +8,19 @@
 #ifndef WIMPSYMBOL_H
 #define WIMPSYMBOL_H
 
+/* Characters to use for each of the symbols */
+#define Symbol_Tick             (0x80)
+#define Symbol_NotMaximised     (0x81)
+#define Symbol_Maximised        (0x82)
+#define Symbol_Resize           (0x83)
+#define Symbol_Close            (0x84)
+#define Symbol_Back             (0x85)
+#define Symbol_Left             (0x88)
+#define Symbol_Right            (0x89)
+#define Symbol_Down             (0x8A)
+#define Symbol_Up               (0x8B)
+#define Symbol_Iconise          (0x98)
+
 /*************************************************** Gerph *********
  Function:      wimpsymbol_free
  Description:   Free a WimpSymbol string that was allocated by wimpsymbol_convert

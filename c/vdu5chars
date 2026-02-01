@@ -1,0 +1,54 @@
+/*******************************************************************
+ * File:        vdu5chars
+ * Purpose:     Definition of the user definable glyphs for the Wimp
+ * Author:      Gerph
+ * Date:        01 Feb 2026
+ ******************************************************************/
+
+#include "swis.h"
+
+#include "wimpsymbol.h"
+
+/* These are the 8bit definitions of the glyph shapes */
+
+typedef struct vdu5char_s {
+    char glyph;
+    char definition[8];
+} vdu5char_t;
+
+static const vdu5char_t vdu5_wimp_symbols[] = {
+    { Symbol_Tick,            {0x03,0x03,0x06,0x06,0x76,0x1C,0x0C,0x00} },
+    { Symbol_NotMaximised,    {0xF0,0x90,0xF0,0x1F,0x1F,0x1F,0x1F,0x00} },
+    { Symbol_Maximised,       {0xE0,0xE0,0xE0,0x1F,0x11,0x11,0x1F,0x00} },
+    { Symbol_Resize,          {0xFE,0x92,0x92,0xF2,0x82,0x82,0xFE,0x00} },
+    { Symbol_Close,           {0x66,0x99,0x81,0x42,0x81,0x99,0x66,0x00} },
+    { Symbol_Back,            {0xFC,0xFC,0xFF,0xE1,0xE1,0x21,0x3F,0x00} },
+    { Symbol_Left,            {0x18,0x28,0x4F,0x81,0x4F,0x28,0x18,0x00} },
+    { Symbol_Right,           {0x18,0x14,0xF2,0x81,0xF2,0x14,0x18,0x00} },
+    { Symbol_Down,            {0x3C,0x24,0x24,0xE7,0x42,0x24,0x18,0x00} },
+    { Symbol_Up,              {0x18,0x24,0x42,0xE7,0x24,0x24,0x3C,0x00} },
+    { 0 /* End of list */ }
+};
+
+
+/*************************************************** Gerph *********
+ Function:      vdu5chars_define
+ Description:   Define all the VDU5 glyph for the Wimp
+ Parameters:    none
+ Returns:       none
+ ******************************************************************/
+void vdu5chars_define(void)
+{
+    const vdu5char_t *cp;
+
+    for (cp = vdu5_wimp_symbols;
+         cp->glyph != 0;
+         cp++)
+    {
+        char buf[2];
+        buf[0] = 23;
+        buf[1] = cp->glyph;
+        _swix(OS_WriteN, _INR(0, 1), buf, 2);
+        _swix(OS_WriteN, _INR(0, 1), cp->definition, 8);
+    }
+}
