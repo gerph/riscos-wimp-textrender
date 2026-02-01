@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
     textrender_setfont(trender);
 
     {
-        const char *msg = "Hello world! \x80\x81\x82\x83\x84\x85\x88\x89\x8a\x8b\x98";
+        const char *msg = "Hello world! \x80 \x81 \x82 \x83 \x84 \x85 \x88 \x89 \x8a \x8b \x98";
         /*
     Symbol_Tick             = 0x80
     Symbol_NotMaximised     = 0x81
