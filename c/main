@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
         int width = textrender_stringwidth(trender, msg, 0);
         textrender_setcolours(trender, 0x00000000, 0x8888FF00);
         textrender_paint(trender, msg, 64, 800);
-        gcontext->line_start(gcontext, 0x88000000);
+        gcontext->line_start(gcontext, 0xFF000000);
         gcontext->line_line(gcontext, 64, 800, 64+width, 800);
         gcontext->line_end(gcontext);
     }

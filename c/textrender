@@ -231,7 +231,7 @@ int32_t textrender_stringwidth(textrender_t *trender, const char *text, int len)
         /* FIXME: text should be control terminated, but getstringsize treats it as 0-terminated */
         trender->gcontext->text_getstringsize(trender->gcontext, trender->font,
                                               &bounds, 0x7FFFFFFF,
-                                              text, len, -1);
+                                              text, len, 0);
         if (bounds.rbearing > bounds.xoffset)
             width = bounds.rbearing;
         else
