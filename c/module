@@ -97,8 +97,11 @@ _kernel_oserror *SWI_TextOp(int number, _kernel_swi_regs *r, void *pw)
                <= R0 corrupted
                   R1, R2 preserved
               */
-            textrender_setcolours(trender, r->r[2], r->r[1]);
-            err = NULL;
+            {
+                colour_t fg = (colour_t)r->r[1];
+                colour_t bg = (colour_t)r->r[2];
+                err = textop_settextcolour(trender, fg, bg);
+            }
             break;
 
         case WimpTextOp_TextWidth:
@@ -112,9 +115,9 @@ _kernel_oserror *SWI_TextOp(int number, _kernel_swi_regs *r, void *pw)
             {
                 const char *msg = (char*)r->r[1];
                 int max = r->r[2];
-                int width = textrender_stringwidth(trender, msg, max);
+                int width;
+                err = textop_stringwidth(trender, msg, max, &width);
                 r->r[0] = width;
-                err = NULL;
             }
             break;
 
@@ -136,10 +139,7 @@ _kernel_oserror *SWI_TextOp(int number, _kernel_swi_regs *r, void *pw)
                 const char *msg = (const char *)r->r[1];
                 int x = r->r[4];
                 int y = r->r[5];
-                if (flags != 0)
-                    return err_NotImplemented;
-                textrender_paint(trender, msg, x, y);
-                err = NULL;
+                err = textop_rendertext(trender, flags, msg, x, y);
             }
             break;
 

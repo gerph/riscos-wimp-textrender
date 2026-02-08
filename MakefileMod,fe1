@@ -39,6 +39,7 @@ OBJS       = o.module \
              o.modhead \
              o.textrender \
              o.textrender_nvram \
+             o.textop \
              o.vdu5chars \
              o.wimpsymbol \
 

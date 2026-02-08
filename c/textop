@@ -1,30 +1,16 @@
 /*******************************************************************
  * File:        textop
- * Purpose:     Definitions for the Wimp_TextOp
+ * Purpose:     Implementation of the Wimp_TextOp calls
  * Author:      Gerph
- * Date:        01 Feb 2026
+ * Date:        08 Feb 2026
  ******************************************************************/
 
-#ifndef TEXTOP_H
-#define TEXTOP_H
+#include <stdlib.h>
+#include "kernel.h"
 
+#include "textop.h"
 #include "textrender.h"
-
-#define WimpTextOp_SetTextColour        (0)
-#define WimpTextOp_TextWidth            (1)
-#define WimpTextOp_RenderText           (2)
-#define WimpTextOp_GetSplitPoint        (3)
-#define WimpTextOp_TruncateWithEllipsis (4)
-
-/* Wimp_TextOp 2 - render */
-#define WimpTextOp_RightJustify         (1 << 31)
-#define WimpTextOp_VerticalJustify      (1 << 30)
-#define WimpTextOp_Offset               (1 << 29)
-#define WimpTextOp_VerticalCentre       (1 << 28)
-#define WimpTextOp_Style                (1 << 27)
-
-/* Wimp_TextOp 3 - set split point */
-#define WimpTextOp_ReturnBBox           (1 << 31)
+#include "modhead.h"
 
 
 /*************************************************** Gerph *********
@@ -35,7 +21,11 @@
                 bg = background colour as &BBGGRR00
  Returns:       none
  ******************************************************************/
-_kernel_oserror *textop_settextcolour(textrender_t *trender, colour_t fg, colour_t bg);
+_kernel_oserror *textop_settextcolour(textrender_t *trender, colour_t fg, colour_t bg)
+{
+    textrender_setcolours(trender, bg, fg);
+    return NULL;
+}
 
 
 /*************************************************** Gerph *********
@@ -47,7 +37,12 @@ _kernel_oserror *textop_settextcolour(textrender_t *trender, colour_t fg, colour
                 widthp-> where to store the width of the string
  Returns:       pointer to error block, or NULL if successful
  ******************************************************************/
-_kernel_oserror *textop_stringwidth(textrender_t *trender, const char *msg, int max, int *widthp);
+_kernel_oserror *textop_stringwidth(textrender_t *trender, const char *msg, int max, int *widthp)
+{
+    *widthp = textrender_stringwidth(trender, msg, max);
+    return NULL;
+}
+
 
 /*************************************************** Gerph *********
  Function:      textop_rendertext
@@ -58,6 +53,10 @@ _kernel_oserror *textop_stringwidth(textrender_t *trender, const char *msg, int 
                 x, y = where to render in OS units
  Returns:       pointer to error block, or NULL if successful
  ******************************************************************/
-_kernel_oserror *textop_rendertext(textrender_t *trender, uint32_t flags, const char *msg, int x, int y);
-
-#endif
+_kernel_oserror *textop_rendertext(textrender_t *trender, uint32_t flags, const char *msg, int x, int y)
+{
+    if (flags != 0)
+        return err_NotImplemented;
+    textrender_paint(trender, msg, x, y);
+    return NULL;
+}
