@@ -43,21 +43,41 @@ void wimpsymbol_free(const char *symbolstring)
  Function:      wimpsymbol_convert
  Description:   Convert a string to one using wimp symbols
  Parameters:    text-> the text string we are converting
- Returns:       pointer to a new string (or the same one) that we can use in FontManager.
+                len = the length to process
+                wimpsymbolfont = font for symbols
+                regularfont = font for text
+ Returns:       wimpsymbol_string containing pointer to a new string
+                (or the same one) that we can use in FontManager, and a length
  ******************************************************************/
-const char *wimpsymbol_convert(const char *text,
-                               int wimpsymbolfont,
-                               int regularfont)
+wimpsymbol_string_t wimpsymbol_convert(const char *text,
+                                       int len,
+                                       int wimpsymbolfont,
+                                       int regularfont)
 {
-    /* FIXME: Add length parameter */
+    wimpsymbol_string_t wss;
     const char *p;
-    for (p=text; *p >= 32; p++)
+    if (len == -1)
     {
-        if (*p >= 0x80 && *p <= 0x9F)
-            goto needs_conversion;
+        for (p=text; *p >= 32; p++)
+        {
+            if (*p >= 0x80 && *p <= 0x9F)
+                goto needs_conversion;
+        }
+    }
+    else
+    {
+        for (p=text; p - text < len; p++)
+        {
+            if (*p >= 0x80 && *p <= 0x9F)
+                goto needs_conversion;
+        }
     }
     dprintf("No conversion required\n");
-    return text;
+
+no_conversion:
+    wss.string = text;
+    wss.len = p - text;
+    return wss;
 
 needs_conversion:
     {
@@ -69,7 +89,9 @@ needs_conversion:
         char *out;
 
         dprintf("String needs wimpsymbol applying, ok up to '%.*s'\n", p-text, text);
-        for (; *p >= 32; p++)
+        for (;
+             (len == -1) ? (*p >= 32) : p - text < len;
+             p++)
         {
             if (*p >= 0x80 && *p <= 0x9F)
             {
@@ -104,7 +126,8 @@ needs_conversion:
             if (ss.string == NULL)
             {
                 dprintf("Ran out of memory - panic return of original string\n");
-                return text; /* If we ran out of memory, just plot the text directly - worst case it'll display symbols wrongly */
+                 /* If we ran out of memory, just plot the text directly - worst case it'll display symbols wrongly */
+                goto no_conversion;
             }
         }
 
@@ -140,9 +163,12 @@ needs_conversion:
         }
 
         /* Terminate our string */
-        *out++ = '\0';
+        *out = '\0';
         dprintf("\n");
+
+        wss.string = ss.string;
+        wss.len = out - ss.string;
     }
 
-    return ss.string;
+    return wss;
 }

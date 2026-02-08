@@ -21,6 +21,11 @@
 #define Symbol_Up               (0x8B)
 #define Symbol_Iconise          (0x98)
 
+typedef struct wimpsymbol_string_s {
+    const char *string;
+    int len;
+} wimpsymbol_string_t;
+
 /*************************************************** Gerph *********
  Function:      wimpsymbol_free
  Description:   Free a WimpSymbol string that was allocated by wimpsymbol_convert
@@ -33,10 +38,15 @@ void wimpsymbol_free(const char *symbolstring);
  Function:      wimpsymbol_convert
  Description:   Convert a string to one using wimp symbols
  Parameters:    text-> the text string we are converting
- Returns:       pointer to a new string (or the same one) that we can use in FontManager.
+                len = the length to process
+                wimpsymbolfont = font for symbols
+                regularfont = font for text
+ Returns:       wimpsymbol_string containing pointer to a new string
+                (or the same one) that we can use in FontManager, and a length
  ******************************************************************/
-const char *wimpsymbol_convert(const char *text,
-                               int wimpsymbolfont,
-                               int regularfont);
+wimpsymbol_string_t wimpsymbol_convert(const char *text,
+                                       int len,
+                                       int wimpsymbolfont,
+                                       int regularfont);
 
 #endif

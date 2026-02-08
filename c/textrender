@@ -239,15 +239,17 @@ void textrender_setcolours(textrender_t *trender, colour_t bg, colour_t fg)
 void textrender_paint(textrender_t *trender, const char *text, int len, int x, int y)
 {
     const char *newtext = NULL;
+    wimpsymbol_string_t wss;
     len = textrender_convertlength(text, len);
 
     if (! IS_SYSTEM_FONT(trender))
     {
-        /* FIXME: We don't support the length here */
-        newtext = wimpsymbol_convert(text,
-                                     trender->gcontext->text_readhandle(trender->gcontext, trender->wimpsymbol),
-                                     trender->gcontext->text_readhandle(trender->gcontext, trender->font));
-        text = newtext;
+        wss = wimpsymbol_convert(text, len,
+                                 trender->gcontext->text_readhandle(trender->gcontext, trender->wimpsymbol),
+                                 trender->gcontext->text_readhandle(trender->gcontext, trender->font));
+        newtext = wss.string;
+        text = wss.string;
+        len = wss.len;
     }
     trender->gcontext->text_paint(trender->gcontext, trender->font,
                                   x, y, trender->bg, trender->fg,
@@ -273,13 +275,15 @@ int32_t textrender_stringwidth(textrender_t *trender, const char *text, int len)
 
     {
         const char *newtext = NULL;
+        wimpsymbol_string_t wss;
         if (! IS_SYSTEM_FONT(trender))
         {
-            /* FIXME Length not handled in symbol conversion */
-            newtext = wimpsymbol_convert(text,
-                                         trender->gcontext->text_readhandle(trender->gcontext, trender->wimpsymbol),
-                                         trender->gcontext->text_readhandle(trender->gcontext, trender->font));
-            text = newtext;
+            wss = wimpsymbol_convert(text, len,
+                                     trender->gcontext->text_readhandle(trender->gcontext, trender->wimpsymbol),
+                                     trender->gcontext->text_readhandle(trender->gcontext, trender->font));
+            newtext = wss.string;
+            text = wss.string;
+            len = wss.len;
         }
         trender->gcontext->text_getstringsize(trender->gcontext, trender->font,
                                               &bounds, 0x7FFFFFFF,
@@ -314,13 +318,16 @@ const char *textrender_stringwidthwithsplit(textrender_t *trender, const char *t
 
     {
         const char *newtext = NULL;
+        wimpsymbol_string_t wss;
         if (! IS_SYSTEM_FONT(trender))
         {
             /* FIXME Length not handled in symbol conversion */
-            newtext = wimpsymbol_convert(text,
-                                         trender->gcontext->text_readhandle(trender->gcontext, trender->wimpsymbol),
-                                         trender->gcontext->text_readhandle(trender->gcontext, trender->font));
-            text = newtext;
+            wss = wimpsymbol_convert(text, len,
+                                     trender->gcontext->text_readhandle(trender->gcontext, trender->wimpsymbol),
+                                     trender->gcontext->text_readhandle(trender->gcontext, trender->font));
+            newtext = wss.string;
+            text = wss.string;
+            len = wss.len;
         }
         trender->gcontext->text_getstringsize(trender->gcontext, trender->font,
                                               &bounds, width,
