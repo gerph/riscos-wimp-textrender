@@ -26,7 +26,6 @@
 /* Wimp_TextOp 3 - set split point */
 #define WimpTextOp_ReturnBBox           (1 << 31)
 
-
 /*************************************************** Gerph *********
  Function:      textop_settextcolour
  Description:   Wimp_TextOp 0 implementation of setting the colour used for the main text context
@@ -59,5 +58,21 @@ _kernel_oserror *textop_stringwidth(textrender_t *trender, const char *msg, int 
  Returns:       pointer to error block, or NULL if successful
  ******************************************************************/
 _kernel_oserror *textop_rendertext(textrender_t *trender, uint32_t flags, const char *msg, int x, int y);
+
+/*************************************************** Gerph *********
+ Function:     textop_getsplitpoint
+ Description:  Return the split position within a string, given a
+               width and split character
+ Parameters:   trender-> text rendering context
+               msg-> the string to read the split point of (ctrl-terminated)
+               width = the size to split at, or 1<<30 to not split at a width,
+                       in OS units
+               splitchar = the character to split at, or -1 for none
+               splitp-> where the split occurred
+ Returns:      pointer to error or NULL if none
+ ******************************************************************/
+_kernel_oserror *textop_getsplitpoint(textrender_t *trender,
+                                      const char *msg, int width, int splitchar,
+                                      const char **splitp);
 
 #endif

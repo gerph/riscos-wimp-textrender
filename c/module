@@ -115,7 +115,7 @@ _kernel_oserror *SWI_TextOp(int number, _kernel_swi_regs *r, void *pw)
             {
                 const char *msg = (char*)r->r[1];
                 int max = r->r[2];
-                int width;
+                int32_t width;
                 err = textop_stringwidth(trender, msg, max, &width);
                 r->r[0] = width;
             }
@@ -137,13 +137,27 @@ _kernel_oserror *SWI_TextOp(int number, _kernel_swi_regs *r, void *pw)
             {
                 uint32_t flags = r->r[0] &~0xFF;
                 const char *msg = (const char *)r->r[1];
-                int x = r->r[4];
-                int y = r->r[5];
+                int32_t x = r->r[4];
+                int32_t y = r->r[5];
                 err = textop_rendertext(trender, flags, msg, x, y);
             }
             break;
 
         case WimpTextOp_GetSplitPoint:
+            /* => R0 = 3
+                  R1 = pointer to ctrl-terminated string
+                  R2 = width in OS units
+                  R3 = split character, or -1 for no split point
+               <= R0 = pointer to split point
+              */
+            {
+                const char *msg = (const char *)r->r[1];
+                int32_t width = (int32_t)r->r[2];
+                int splitchar = (int)r->r[3];
+                const char *splitp;
+                err = textop_getsplitpoint(trender, msg, width, splitchar, &splitp);
+                r->r[0] = (int)splitp;
+            }
             break;
 
         case WimpTextOp_TruncateWithEllipsis:

@@ -15,6 +15,13 @@
 
 #define FONTNAME_MAX (256)
 
+/* Terminating characters in the strings */
+#define TEXTRENDER_TERM0    (-1)
+#define TEXTRENDER_TERMCTRL (-2)
+
+#define TEXTRENDER_NOSPLIT  (0)
+
+
 typedef struct textrender_s textrender_t;
 
 typedef struct desktopfont_s {
@@ -54,11 +61,12 @@ void textrender_setcolours(textrender_t *trender, colour_t bg, colour_t fg);
  Description:   Draw some simple text
  Parameters:    trender-> the rendering context
                 text-> string to render
+                len = the length to render (or TEXTRENDER_TERM* to use 0-terminated)
                 x = position
                 y = position
  Returns:       none
  ******************************************************************/
-void textrender_paint(textrender_t *trender, const char *text, int x, int y);
+void textrender_paint(textrender_t *trender, const char *text, int len, int x, int y);
 
 /*************************************************** Gerph *********
  Function:      textrender_stringwidth
@@ -69,5 +77,17 @@ void textrender_paint(textrender_t *trender, const char *text, int x, int y);
  Returns:       the width in OS units
  ******************************************************************/
 int32_t textrender_stringwidth(textrender_t *trender, const char *text, int len);
+
+/*************************************************** Gerph *********
+ Function:      textrender_stringwidthwithsplit
+ Description:   Work out the split point for a string with a width
+ Parameters:    trender-> the rendering context
+                text-> string to size, ctrl terminated)
+                len = the length of the string (or TEXTRENDER_TERM* for 0-termination)
+                width = the width to split at
+                splitchar = character to split on (or TEXTRENDER_NOSPLIT for none)
+ Returns:       split point pointer within the text string.
+ ******************************************************************/
+const char *textrender_stringwidthwithsplit(textrender_t *trender, const char *text, int len, int32_t width, int splitchar);
 
 #endif

@@ -13,6 +13,15 @@
 #include "modhead.h"
 
 
+#define DEBUG
+
+#ifdef DEBUG
+#define dprintf if (1) printf
+#else
+#define dprintf if (0) printf
+#endif
+
+
 /*************************************************** Gerph *********
  Function:      textop_settextcolour
  Description:   Wimp_TextOp 0 implementation of setting the colour used for the main text context
@@ -32,13 +41,14 @@ _kernel_oserror *textop_settextcolour(textrender_t *trender, colour_t fg, colour
  Function:      textop_stringwidth
  Description:   Wimp_TextOp 1 implementation of reading string width
  Parameters:    trender-> text rendering context
-                msg-> the text to size
+                msg-> the text to size (ctrl-terminated)
                 max = the limit, or 0 for the whole string
                 widthp-> where to store the width of the string
  Returns:       pointer to error block, or NULL if successful
  ******************************************************************/
 _kernel_oserror *textop_stringwidth(textrender_t *trender, const char *msg, int max, int *widthp)
 {
+    /* FIXME: Text direction not supported */
     *widthp = textrender_stringwidth(trender, msg, max);
     return NULL;
 }
@@ -49,7 +59,7 @@ _kernel_oserror *textop_stringwidth(textrender_t *trender, const char *msg, int 
  Description:   Wimp_TextOp 2 implementation of writing text
  Parameters:    trender-> text rendering context
                 flags = the rendering flags for the style to render with
-                msg-> the text to render
+                msg-> the text to render (0-terminated)
                 x, y = where to render in OS units
  Returns:       pointer to error block, or NULL if successful
  ******************************************************************/
@@ -57,6 +67,31 @@ _kernel_oserror *textop_rendertext(textrender_t *trender, uint32_t flags, const 
 {
     if (flags != 0)
         return err_NotImplemented;
-    textrender_paint(trender, msg, x, y);
+    /* FIXME: Text direction not supported */
+    textrender_paint(trender, msg, TEXTRENDER_TERM0, x, y);
+    return NULL;
+}
+
+
+/*************************************************** Gerph *********
+ Function:     textop_getsplitpoint
+ Description:  Return the split position within a string, given a
+               width and split character
+ Parameters:   trender-> text rendering context
+               msg-> the string to read the split point of (ctrl-terminated)
+               width = the size to split at, or 1<<30 to not split at a width,
+                       in OS units
+               splitchar = the character to split at, or -1 for none
+               splitp-> where the split occurred
+ Returns:      pointer to error or NULL if none
+ ******************************************************************/
+_kernel_oserror *textop_getsplitpoint(textrender_t *trender,
+                                      const char *msg, int width, int splitchar,
+                                      const char **splitp)
+{
+    /* FIXME: Text direction not supported */
+    dprintf("textop_getsplitpoint: %s width %i\n", msg, width);
+    *splitp = textrender_stringwidthwithsplit(trender, msg, TEXTRENDER_TERMCTRL, width, splitchar);
+
     return NULL;
 }
