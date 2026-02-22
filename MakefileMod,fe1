@@ -37,6 +37,7 @@ CDEFINES   =
 # Objects to build, using the format o.<name> (will be varied for build type)
 OBJS       = o.module \
              o.modhead \
+             o.readsysinfo \
              o.textrender \
              o.textrender_nvram \
              o.textop \

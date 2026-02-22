@@ -70,7 +70,9 @@ int main(int argc, char *argv[])
         }
     }
 
+#if 0 /* Disable so that the CI passes */
     getchar(); /* Wait for key press */
+#endif
     _swix(OS_WriteI + 12, 0); /* Clear screen */
 
     {

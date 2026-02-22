@@ -1,0 +1,351 @@
+/*******************************************************************
+ * File:        readsysinfo
+ * Purpose:     Implementation of the Wimp_ReadSysInfo calls
+ * Author:      Gerph
+ * Date:        22 Feb 2026
+ ******************************************************************/
+
+#include <stdio.h>
+
+#include "kernel.h"
+
+#include "modhead.h"
+#include "WimpReadSysInfo.h"
+
+#include "textrender.h"
+
+#define DEBUG
+
+#ifdef DEBUG
+#define dprintf if (1) printf
+#else
+#define dprintf if (0) printf
+#endif
+
+extern textrender_t *trender;
+
+
+/* Wimp_ReadSysInfo 0x0 */
+_kernel_oserror *wimpsysinfo_tasksactive(_kernel_swi_regs *r)
+{
+    return err_NotImplemented;
+}
+
+/* Wimp_ReadSysInfo 0x1 */
+_kernel_oserror *wimpsysinfo_mode(_kernel_swi_regs *r)
+{
+    return err_NotImplemented;
+}
+
+/* Wimp_ReadSysInfo 0x2 */
+_kernel_oserror *wimpsysinfo_readspritesuffix(_kernel_swi_regs *r)
+{
+    return err_NotImplemented;
+}
+
+/* Wimp_ReadSysInfo 0x3 */
+_kernel_oserror *wimpsysinfo_desktopstate(_kernel_swi_regs *r)
+{
+    return err_NotImplemented;
+}
+
+/* Wimp_ReadSysInfo 0x4 */
+_kernel_oserror *wimpsysinfo_writedirection(_kernel_swi_regs *r)
+{
+    return err_NotImplemented;
+}
+
+/* Wimp_ReadSysInfo 0x5 */
+_kernel_oserror *wimpsysinfo_currenttask(_kernel_swi_regs *r)
+{
+    return err_NotImplemented;
+}
+
+/* Wimp_ReadSysInfo 0x6 - reserved for swapping Window Manager */
+_kernel_oserror *wimpsysinfo_swapping(_kernel_swi_regs *r)
+{
+    return err_NotImplemented;
+}
+
+/* Wimp_ReadSysInfo 0x7 */
+_kernel_oserror *wimpsysinfo_wimpversion(_kernel_swi_regs *r)
+{
+    return err_NotImplemented;
+}
+
+/* Wimp_ReadSysInfo 0x8 */
+_kernel_oserror *wimpsysinfo_systemfont(_kernel_swi_regs *r)
+{
+    /* <= R0 = font handle of desktop font, or 0 if system font.
+          R1 = font handle of the symbol font
+     */
+    int desktop_font_handle;
+    int symbol_font_handle;
+    textrender_readfonthandles(trender, &desktop_font_handle, &symbol_font_handle);
+
+    r->r[0] = desktop_font_handle;
+    r->r[1] = symbol_font_handle;
+    return NULL;
+}
+
+/* Wimp_ReadSysInfo 0x9 */
+_kernel_oserror *wimpsysinfo_toolsprites(_kernel_swi_regs *r)
+{
+    return err_NotImplemented;
+}
+
+/* Wimp_ReadSysInfo 0xa */
+_kernel_oserror *wimpsysinfo_iconbar(_kernel_swi_regs *r)
+{
+    return err_NotImplemented;
+}
+
+/* Wimp_ReadSysInfo 0xb */
+_kernel_oserror *wimpsysinfo_appspacesize(_kernel_swi_regs *r)
+{
+    return err_NotImplemented;
+}
+
+/* Wimp_ReadSysInfo 0xc - debugging only */
+_kernel_oserror *wimpsysinfo_messagesdebug(_kernel_swi_regs *r)
+{
+    return err_NotImplemented;
+}
+
+/* Wimp_ReadSysInfo 0xd - debugging only */
+_kernel_oserror *wimpsysinfo_memorydebug(_kernel_swi_regs *r)
+{
+    return err_NotImplemented;
+}
+
+/* Wimp_ReadSysInfo 0xe - internal use */
+_kernel_oserror *wimpsysinfo_transtables(_kernel_swi_regs *r)
+{
+    return err_NotImplemented;
+}
+
+/* Wimp_ReadSysInfo 0xf - disabled in Wimp 3.99 onwards */
+_kernel_oserror *wimpsysinfo_iconisebutton(_kernel_swi_regs *r)
+{
+    return err_NotImplemented;
+}
+
+/* Wimp_ReadSysInfo 0x10 - Wimp 3.99 onwards */
+_kernel_oserror *wimpsysinfo_baseofsprites(_kernel_swi_regs *r)
+{
+    return err_NotImplemented;
+}
+
+/* Wimp_ReadSysInfo 0x11 - Wimp 3.99 onwards */
+_kernel_oserror *wimpsysinfo_scrollpause(_kernel_swi_regs *r)
+{
+    return err_NotImplemented;
+}
+
+/* Wimp_ReadSysInfo 0x12 - disabled (experimental feature) */
+_kernel_oserror *wimpsysinfo_taskpollword(_kernel_swi_regs *r)
+{
+    return err_NotImplemented;
+}
+
+/* Wimp_ReadSysInfo 0x13 - extended sprites base info */
+_kernel_oserror *wimpsysinfo_baseofsprites2(_kernel_swi_regs *r)
+{
+    return err_NotImplemented;
+}
+
+/* Wimp_ReadSysInfo 0x14 - selected icon colours */
+_kernel_oserror *wimpsysinfo_specialhighlights(_kernel_swi_regs *r)
+{
+    return err_NotImplemented;
+}
+
+/* Wimp_ReadSysInfo 0x15 - text selection colours */
+_kernel_oserror *wimpsysinfo_textselections(_kernel_swi_regs *r)
+{
+    return err_NotImplemented;
+}
+
+/* Wimp_ReadSysInfo 0x16 - cursor colour */
+_kernel_oserror *wimpsysinfo_cursorcolour(_kernel_swi_regs *r)
+{
+    return err_NotImplemented;
+}
+
+/* Wimp_ReadSysInfo 0x17 - drag move and delay */
+_kernel_oserror *wimpsysinfo_dragmovedelay(_kernel_swi_regs *r)
+{
+    return err_NotImplemented;
+}
+
+/* Wimp_ReadSysInfo 0x18 - double-click move and delay */
+_kernel_oserror *wimpsysinfo_dclickmovedelay(_kernel_swi_regs *r)
+{
+    return err_NotImplemented;
+}
+
+/* Wimp_ReadSysInfo 0x19 - delays on auto-opening menus */
+_kernel_oserror *wimpsysinfo_automenudelays(_kernel_swi_regs *r)
+{
+    return err_NotImplemented;
+}
+
+/* Wimp_ReadSysInfo 0x1a - iconbar scrolling settings */
+_kernel_oserror *wimpsysinfo_iconbarscrolling(_kernel_swi_regs *r)
+{
+    return err_NotImplemented;
+}
+
+/* Wimp_ReadSysInfo 0x1b - edge notification delay */
+_kernel_oserror *wimpsysinfo_edgenotifydelay(_kernel_swi_regs *r)
+{
+    return err_NotImplemented;
+}
+
+
+
+
+/***************************************************************************
+ * Description:  SWI handler routine. All SWIs for this module will be
+ *               passed to these routines.
+ * Parameters:   number = SWI number within SWI chunk (i.e. 0 to 63)
+ *               r      = pointer to register block on entry
+ *               pw     = private word for module
+ * On exit:      Return NULL if SWI handled successfully, setting return
+ *               register values (r0-r9) in r.
+ *               Return error_BAD_SWI for out of range SWIs.
+ *               Return an error block for a custom error.
+ **************************************************************************/
+/* Functions called to handle particular SWI calls */
+_kernel_oserror *SWI_ReadSysInfo(int number, _kernel_swi_regs *r, void *pw)
+{
+    /* Implements Wimp_ReadSysInfo */
+    /* => R0 = the reason code
+       <= Dependant on the reason
+     */
+    _kernel_oserror *err = err_NotImplemented;
+    int reason = r->r[0];
+    dprintf("ReadSysInfo %i\n", reason);
+
+    switch (reason)
+    {
+        case WimpSysInfo_TasksActive:
+            err = wimpsysinfo_tasksactive(r);
+            break;
+
+        case WimpSysInfo_Mode:
+            err = wimpsysinfo_mode(r);
+            break;
+
+        case WimpSysInfo_ReadSpriteSuffix:
+            err = wimpsysinfo_readspritesuffix(r);
+            break;
+
+        case WimpSysInfo_DesktopState:
+            err = wimpsysinfo_desktopstate(r);
+            break;
+
+        case WimpSysInfo_WriteDirection:
+            err = wimpsysinfo_writedirection(r);
+            break;
+
+        case WimpSysInfo_CurrentTask:
+            err = wimpsysinfo_currenttask(r);
+            break;
+
+        case WimpSysInfo_Swapping:
+            err = wimpsysinfo_swapping(r);
+            break;
+
+        case WimpSysInfo_WimpVersion:
+            err = wimpsysinfo_wimpversion(r);
+            break;
+
+        case WimpSysInfo_SystemFont:
+            err = wimpsysinfo_systemfont(r);
+            break;
+
+        case WimpSysInfo_ToolSprites:
+            err = wimpsysinfo_toolsprites(r);
+            break;
+
+        case WimpSysInfo_IconBar:
+            err = wimpsysinfo_iconbar(r);
+            break;
+
+        case WimpSysInfo_AppSpaceSize:
+            err = wimpsysinfo_appspacesize(r);
+            break;
+
+        case WimpSysInfo_MessagesDebug:
+            err = wimpsysinfo_messagesdebug(r);
+            break;
+
+        case WimpSysInfo_MemoryDebug:
+            err = wimpsysinfo_memorydebug(r);
+            break;
+
+        case WimpSysInfo_TransTables:
+            err = wimpsysinfo_transtables(r);
+            break;
+
+        case WimpSysInfo_IconiseButton:
+            err = wimpsysinfo_iconisebutton(r);
+            break;
+
+        case WimpSysInfo_BaseOfSprites:
+            err = wimpsysinfo_baseofsprites(r);
+            break;
+
+        case WimpSysInfo_ScrollPause:
+            err = wimpsysinfo_scrollpause(r);
+            break;
+
+        case WimpSysInfo_TaskPollword:
+            err = wimpsysinfo_taskpollword(r);
+            break;
+
+        case WimpSysInfo_BaseOfSprites2:
+            err = wimpsysinfo_baseofsprites2(r);
+            break;
+
+        case WimpSysInfo_SpecialHighlights:
+            err = wimpsysinfo_specialhighlights(r);
+            break;
+
+        case WimpSysInfo_TextSelections:
+            err = wimpsysinfo_textselections(r);
+            break;
+
+        case WimpSysInfo_CursorColour:
+            err = wimpsysinfo_cursorcolour(r);
+            break;
+
+        case WimpSysInfo_DragMoveDelay:
+            err = wimpsysinfo_dragmovedelay(r);
+            break;
+
+        case WimpSysInfo_DClickMoveDelay:
+            err = wimpsysinfo_dclickmovedelay(r);
+            break;
+
+        case WimpSysInfo_AutoMenuDelays:
+            err = wimpsysinfo_automenudelays(r);
+            break;
+
+        case WimpSysInfo_IconbarScrolling:
+            err = wimpsysinfo_iconbarscrolling(r);
+            break;
+
+        case WimpSysInfo_EdgeNotifyDelay:
+            err = wimpsysinfo_edgenotifydelay(r);
+            break;
+
+        default:
+            err = err_NotImplemented;
+            break;
+    }
+
+    return err;
+}
+

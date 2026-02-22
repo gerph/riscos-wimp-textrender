@@ -241,4 +241,3 @@ _kernel_oserror *SWI_SetFontColours(int number, _kernel_swi_regs *r, void *pw)
     /* 14 means 'anti-alias' these days */
     return _swix(ColourTrans_SetFontColours, _INR(0, 3), 0, col_bg, col_fg, 14);
 }
-

@@ -94,7 +94,8 @@ finalisation-code: Mod_Final
 ; may be followed by /<entry> to use a particular routine to handle a SWI.
 swi-decoding-table: WimpTextRender TextOp/SWI_TextOp,
                                    SetTextColour/SWI_SetTextColour,
-                                   SetFontColours/SWI_SetFontColours
+                                   SetFontColours/SWI_SetFontColours,
+                                   ReadSysInfo/SWI_ReadSysInfo
 
 ; The library initialisation code sets up the C environment for use with
 ; this module. You may wish to perform some initialisation prior to the C

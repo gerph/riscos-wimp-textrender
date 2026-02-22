@@ -78,13 +78,13 @@ textrender_t *textrender_init(gcontext_t *gcontext)
 }
 
 /*************************************************** Gerph *********
- Function:      textrender_readfont
- Description:   Read the font that should be used for this context
+ Function:      textrender_determinefont
+ Description:   Determine which font should be used for this context
  Parameters:    trender-> the rendering context
                 desktopfont-> where to populate the font to use
  Returns:       none
  ******************************************************************/
-void textrender_readfont(textrender_t *trender, desktopfont_t *desktopfont)
+static void textrender_determinefont(textrender_t *trender, desktopfont_t *desktopfont)
 {
     const char *fontname;
     const char *size;
@@ -149,8 +149,8 @@ void textrender_readfont(textrender_t *trender, desktopfont_t *desktopfont)
 
     desktopfont->xsize = xsize;
     desktopfont->ysize = ysize;
-    dprintf("textrender_readfont(): %s, at %i x %i\n", desktopfont->systemfont ? "SYSTEM" : desktopfont->fontname,
-                                                       desktopfont->xsize, desktopfont->ysize);
+    dprintf("textrender_determinefont(): %s, at %i x %i\n", desktopfont->systemfont ? "SYSTEM" : desktopfont->fontname,
+                                                            desktopfont->xsize, desktopfont->ysize);
 }
 
 
@@ -163,7 +163,7 @@ void textrender_readfont(textrender_t *trender, desktopfont_t *desktopfont)
 void textrender_setfont(textrender_t *trender)
 {
     desktopfont_t dtf;
-    textrender_readfont(trender, &dtf);
+    textrender_determinefont(trender, &dtf);
     if (trender->font != FONT_NONE)
     {
         trender->gcontext->text_losefont(trender->gcontext, trender->font);
@@ -188,6 +188,21 @@ void textrender_setfont(textrender_t *trender)
             trender->ellipsis_width = bounds.xoffset;
         dprintf("Ellipsis width = %i\n", trender->ellipsis_width);
     }
+}
+
+
+/*************************************************** Gerph *********
+ Function:      textrender_readfonthandles
+ Description:   Read the font handles that are used in a context
+ Parameters:    trender-> the rendering context
+                desktop_font_handlep-> where to store the font handle for the desktop font
+                symbol_font_handlep-> where to store the font handle for the symbol font
+ Returns:       none
+ ******************************************************************/
+void textrender_readfonthandles(textrender_t *trender, int *desktop_font_handlep, int *symbol_font_handlep)
+{
+    *desktop_font_handlep = (trender->font == FONT_NONE) ? 0 :trender->gcontext->text_readhandle(trender->gcontext, trender->font);
+    *symbol_font_handlep = (trender->wimpsymbol == FONT_NONE) ? 0 : trender->gcontext->text_readhandle(trender->gcontext, trender->wimpsymbol);
 }
 
 
