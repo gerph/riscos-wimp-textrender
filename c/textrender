@@ -392,7 +392,15 @@ int textrender_truncatewithellipsis(/* In */
         dprintf("Doesn't fit, taking away ellipsis width\n");
         width -= trender->ellipsis_width;
         if (width < 0)
-            tail = text; /* Can't even fit the ellipsis in, so do nothing */
+        {
+            /* Can't even fit the ellipsis in, so do nothing */
+            if (buffer == NULL || buffersize == 0)
+            {
+                return 1;
+            }
+            *buffer = '\0';
+            return 1;
+        }
         else
         {
             /* Get split point for the newly truncated width */

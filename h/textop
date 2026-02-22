@@ -75,4 +75,22 @@ _kernel_oserror *textop_getsplitpoint(textrender_t *trender,
                                       const char *msg, int width, int splitchar,
                                       const char **splitp);
 
+/*************************************************** Gerph *********
+ Function:     textop_truncatewithellipsis
+ Description:  Return the split position within a string, given a
+               width and split character
+ Parameters:   trender-> text rendering context
+               msg-> the string to truncate (ctrl-terminated)
+               buffer-> output buffer
+               buffersize = the size of buffer, or 0 to read size
+               width = the size to split at in OS units
+               bufferneededp -> where to store the size we needed
+ Returns:      pointer to error or NULL if none
+ ******************************************************************/
+_kernel_oserror *textop_truncatewithellipsis(textrender_t *trender,
+                                             const char *msg,
+                                             char *buffer, int buffersize,
+                                             int width,
+                                             int *bufferneededp);
+
 #endif

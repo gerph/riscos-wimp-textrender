@@ -6,6 +6,8 @@
  ******************************************************************/
 
 #include <stdlib.h>
+#include <stdio.h>
+
 #include "kernel.h"
 
 #include "textop.h"
@@ -13,7 +15,7 @@
 #include "modhead.h"
 
 
-#define DEBUG
+//#define DEBUG
 
 #ifdef DEBUG
 #define dprintf if (1) printf
@@ -92,6 +94,41 @@ _kernel_oserror *textop_getsplitpoint(textrender_t *trender,
     /* FIXME: Text direction not supported */
     dprintf("textop_getsplitpoint: %s width %i\n", msg, width);
     *splitp = textrender_stringwidthwithsplit(trender, msg, TEXTRENDER_TERMCTRL, width, splitchar);
+
+    return NULL;
+}
+
+/*************************************************** Gerph *********
+ Function:     textop_truncatewithellipsis
+ Description:  Return the split position within a string, given a
+               width and split character
+ Parameters:   trender-> text rendering context
+               msg-> the string to truncate (ctrl-terminated)
+               buffer-> output buffer
+               buffersize = the size of buffer, or 0 to read size
+               width = the size to split at in OS units
+               bufferneededp -> where to store the size we needed
+ Returns:      pointer to error or NULL if none
+ ******************************************************************/
+_kernel_oserror *textop_truncatewithellipsis(textrender_t *trender,
+                                             const char *msg,
+                                             char *buffer, int buffersize,
+                                             int width,
+                                             int *bufferneededp)
+{
+    /* FIXME: Text direction not supported */
+    int needed;
+    dprintf("textop_truncatewithellipsis: %s width %i\n", msg, width);
+    needed = textrender_truncatewithellipsis(trender,
+                                             msg, TEXTRENDER_TERMCTRL,
+                                             buffer, buffersize,
+                                             width);
+    if (needed < 0)
+    {
+        /* They supplied a buffer, but it was too short */
+        return err_BufferOverflow;
+    }
+    *bufferneededp = needed;
 
     return NULL;
 }

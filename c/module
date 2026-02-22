@@ -161,6 +161,17 @@ _kernel_oserror *SWI_TextOp(int number, _kernel_swi_regs *r, void *pw)
             break;
 
         case WimpTextOp_TruncateWithEllipsis:
+            {
+                const char *msg = (const char *)r->r[1];
+                char *buffer = (char *)r->r[2];
+                int buffersize = r->r[3];
+                int32_t width = (int32_t)r->r[4];
+                int bufferneeded = 0;
+                err = textop_truncatewithellipsis(trender, msg, buffer, buffersize, width, &bufferneeded);
+                if (err)
+                    return err;
+                r->r[0] = bufferneeded;
+            }
             break;
 
         default:

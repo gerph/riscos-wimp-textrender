@@ -14,7 +14,7 @@
 #define Module_VersionString	"0.01"
 #define Module_VersionNumber	1
 #ifndef Module_Date
-#define Module_Date		"08 Feb 2026"
+#define Module_Date		"22 Feb 2026"
 #endif
 
 #ifdef __cplusplus
@@ -81,16 +81,22 @@ _kernel_oserror *SWI_TextOp(int number, _kernel_swi_regs *r, void *pw);
 #if defined(__riscos64) /* RISC OS 64bit build with GCC */
 /* Data is in the .rodata section, so is accessed directly */
 extern _kernel_oserror __err_err_NotImplemented; /* &840000 */
+extern _kernel_oserror __err_err_BufferOverflow; /* &1e4 */
 
 #define err_NotImplemented (&__err_err_NotImplemented)
+#define err_BufferOverflow (&__err_err_BufferOverflow)
 #elif defined(__GNUC__) /* RISC OS 32bit build with GCC */
 extern void __err_err_NotImplemented(void); /* &840001 */
+extern void __err_err_BufferOverflow(void); /* &1e4 */
 
 #define err_NotImplemented ((_kernel_oserror*)(void *)__err_err_NotImplemented)
+#define err_BufferOverflow ((_kernel_oserror*)(void *)__err_err_BufferOverflow)
 #else /* Norcroft */
 extern void __err_err_NotImplemented(void); /* &840002 */
+extern void __err_err_BufferOverflow(void); /* &1e4 */
 
 #define err_NotImplemented ((_kernel_oserror*)(int)__err_err_NotImplemented)
+#define err_BufferOverflow ((_kernel_oserror*)(int)__err_err_BufferOverflow)
 #endif
 
 #ifdef __cplusplus
