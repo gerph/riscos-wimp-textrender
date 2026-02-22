@@ -41,7 +41,7 @@ struct textrender_s {
 };
 
 
-#define DEBUG
+//#define DEBUG
 
 #ifdef DEBUG
 #define dprintf if (1) printf

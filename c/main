@@ -20,7 +20,9 @@ int main(int argc, char *argv[])
 
     vdu5chars_define();
 
+#ifdef TEST_GCONTEXT
     gcontext->rectangle_fill(gcontext, 0x81397900, 64, 64, 500,500);
+#endif
 
     trender = textrender_init(gcontext);
     textrender_setfont(trender);
@@ -46,6 +48,23 @@ int main(int argc, char *argv[])
         gcontext->line_start(gcontext, 0xFF000000);
         gcontext->line_line(gcontext, 64, 800, 64+width, 800);
         gcontext->line_end(gcontext);
+    }
+
+    {
+        const char *msg = "You keep using that word; I don't think it means what you think it means.";
+        int x = 48;
+        int y = 760;
+        int width = 136;
+        for (y = 760; y > 100; y -= 40)
+        {
+            const char *end = textrender_stringwidthwithsplit(trender, msg, TEXTRENDER_TERM0, width, ' ');
+            int len = end - msg;
+            textrender_paint(trender, msg, len, x, y);
+            gcontext->line_start(gcontext, 0xFF000000);
+            gcontext->line_line(gcontext, x, y, x+width, y);
+            gcontext->line_end(gcontext);
+            width += 20;
+        }
     }
 
     exit(EXIT_SUCCESS);
