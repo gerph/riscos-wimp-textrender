@@ -87,6 +87,7 @@ _kernel_oserror *SWI_TextOp(int number, _kernel_swi_regs *r, void *pw)
     /* Implements Wimp_TextOp */
     _kernel_oserror *err = err_NotImplemented;
     int reason = r->r[0] & 0xFF;
+    dprintf("TextOp %i\n", reason);
     switch (reason)
     {
         case WimpTextOp_SetTextColour:

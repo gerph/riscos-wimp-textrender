@@ -379,6 +379,8 @@ int textrender_truncatewithellipsis(/* In */
     int lentruncated;
     int space;
 
+    dprintf("truncate with ellipsis, string '%s', width %i\n", text, width);
+
     tail = textrender_stringwidthwithsplit(trender, text, len, width, TEXTRENDER_NOSPLIT);
     if (*tail < ' ')
     {
