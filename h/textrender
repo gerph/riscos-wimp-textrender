@@ -90,4 +90,24 @@ int32_t textrender_stringwidth(textrender_t *trender, const char *text, int len)
  ******************************************************************/
 const char *textrender_stringwidthwithsplit(textrender_t *trender, const char *text, int len, int32_t width, int splitchar);
 
+
+/*************************************************** Gerph *********
+ Function:      textrender_truncatewithellipsis
+ Description:   Return a buffer containing the string to use to fit
+                in a space, allowing for the ellipsis character at the
+                end
+ Parameters:    trender-> the rendering context
+                text-> string to truncate
+                len = the length of the string (or TEXTRENDER_TERM0 for 0-termination)
+                buffer-> the string to write to, or NULL to read size
+                buffersize = the size of the buffer to write to
+                width = the width to split at
+ Returns:       length used or needed (or -ve if buffer overflow)
+ ******************************************************************/
+int textrender_truncatewithellipsis(/* In */
+                                    textrender_t *trender,
+                                    const char *text, int len,
+                                    char *buffer, int buffersize,
+                                    int32_t width);
+
 #endif

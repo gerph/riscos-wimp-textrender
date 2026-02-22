@@ -25,6 +25,10 @@
 #define DEFAULT_FG  (0xFFFFFF00u)
 #define DEFAULT_BG  (0x00000000u)
 
+#define ELLIPSIS_STRING     "..."
+#define ELLIPSIS_STRING_LEN 3
+
+
 typedef enum textdirection_e {
   td_lefttoright,
   td_righttoleft
@@ -69,6 +73,7 @@ textrender_t *textrender_init(gcontext_t *gcontext)
     trender->bg = DEFAULT_BG;
     trender->wimpsymbol = FONT_NONE;
     trender->direction = td_lefttoright;
+    trender->ellipsis_width = 0;
     return trender;
 }
 
@@ -170,15 +175,18 @@ void textrender_setfont(textrender_t *trender)
     /* Setup the wimp symbol font */
     trender->wimpsymbol = trender->gcontext->text_findfont(trender->gcontext, "WimpSymbol", dtf.xsize, dtf.ysize);
 
-#define ELLIPSIS_STRING "..."
-
     {
         stringbounds_t bounds;
         /* FIXME: Text direction is not taken account of */
         trender->gcontext->text_getstringsize(trender->gcontext, trender->font,
                                               &bounds, 0x7FFFFFFF,
-                                              ELLIPSIS_STRING, strlen(ELLIPSIS_STRING), 0);
-        trender->ellipsis_width = bounds.rbearing - bounds.lbearing;
+                                              ELLIPSIS_STRING, ELLIPSIS_STRING_LEN, GCONTEXT_NOSPLIT);
+
+        if (bounds.rbearing > bounds.xoffset)
+            trender->ellipsis_width = bounds.rbearing;
+        else
+            trender->ellipsis_width = bounds.xoffset;
+        dprintf("Ellipsis width = %i\n", trender->ellipsis_width);
     }
 }
 
@@ -303,7 +311,7 @@ int32_t textrender_stringwidth(textrender_t *trender, const char *text, int len)
  Function:      textrender_stringwidthwithsplit
  Description:   Work out the split point for a string with a width
  Parameters:    trender-> the rendering context
-                text-> string to size, ctrl terminated)
+                text-> string to size, ctrl terminated
                 len = the length of the string (or TEXTRENDER_TERM0 for 0-termination)
                 width = the width to split at
                 splitchar = character to split on (or TEXTRENDER_NOSPLIT for none)
@@ -345,4 +353,75 @@ const char *textrender_stringwidthwithsplit(textrender_t *trender, const char *t
     }
 
     return splitpoint;
+}
+
+
+/*************************************************** Gerph *********
+ Function:      textrender_truncatewithellipsis
+ Description:   Return a buffer containing the string to use to fit
+                in a space, allowing for the ellipsis character at the
+                end
+ Parameters:    trender-> the rendering context
+                text-> string to truncate
+                len = the length of the string (or TEXTRENDER_TERM0 for 0-termination)
+                buffer-> the string to write to, or NULL to read size
+                buffersize = the size of the buffer to write to
+                width = the width to split at
+ Returns:       length used or needed (or -ve if buffer overflow)
+ ******************************************************************/
+int textrender_truncatewithellipsis(/* In */
+                                    textrender_t *trender,
+                                    const char *text, int len,
+                                    char *buffer, int buffersize,
+                                    int32_t width)
+{
+    const char *tail;
+    int lentruncated;
+    int space;
+
+    tail = textrender_stringwidthwithsplit(trender, text, len, width, TEXTRENDER_NOSPLIT);
+    if (*tail < ' ')
+    {
+        /* It all fit in the buffer as is, so need to provide truncation */
+        dprintf("truncate: all fits in the buffer\n");
+    }
+    else
+    {
+        /* It doesn't fit in the buffer, so we need to trucate to allow space
+           for the ellipsis character */
+        dprintf("Doesn't fit, taking away ellipsis width\n");
+        width -= trender->ellipsis_width;
+        if (width < 0)
+            tail = text; /* Can't even fit the ellipsis in, so do nothing */
+        else
+        {
+            /* Get split point for the newly truncated width */
+            tail = textrender_stringwidthwithsplit(trender, text, len, width, TEXTRENDER_NOSPLIT);
+        }
+    }
+
+    lentruncated = tail - text;
+    space = lentruncated + 1; /* +1 for terminator */
+    if (*tail >= ' ')
+        space += ELLIPSIS_STRING_LEN;
+
+    if (buffer == NULL || buffersize == 0)
+    {
+        /* No buffer, so just return the size needed */
+        return space;
+    }
+
+    if (buffersize < space)
+    {
+        /* There wasn't enough room, so return it negative to signal this */
+        return -space;
+    }
+
+    /* Copy the string to their buffer */
+    memcpy(buffer, text, lentruncated);
+
+    /* Append ellipsis */
+    strcpy(buffer + lentruncated, ELLIPSIS_STRING);
+
+    return space;
 }
