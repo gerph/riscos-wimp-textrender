@@ -8,11 +8,14 @@
 #include <stdio.h>
 
 #include "kernel.h"
+#include "swis.h"
+
 #include "modhead.h"
 
 #include "textop.h"
 #include "vdu5chars.h"
 #include "textrender.h"
+#include "palette.h"
 
 #define DEBUG
 
@@ -39,6 +42,8 @@ textrender_t *trender;
 _kernel_oserror *Mod_Init(const char *tail, int podule_base, void *pw)
 {
     gcontext_t *gcontext = gcontext_initvdu(2);
+
+    palette_init();
 
     trender = textrender_init(gcontext);
     textrender_setfont(trender);
@@ -180,3 +185,30 @@ _kernel_oserror *SWI_TextOp(int number, _kernel_swi_regs *r, void *pw)
     }
     return err;
 }
+
+
+
+/***************************************************************************
+ * Description:  SWI handler routine. All SWIs for this module will be
+ *               passed to these routines.
+ * Parameters:   number = SWI number within SWI chunk (i.e. 0 to 63)
+ *               r      = pointer to register block on entry
+ *               pw     = private word for module
+ * On exit:      Return NULL if SWI handled successfully, setting return
+ *               register values (r0-r9) in r.
+ *               Return error_BAD_SWI for out of range SWIs.
+ *               Return an error block for a custom error.
+ **************************************************************************/
+/* Functions called to handle particular SWI calls */
+_kernel_oserror *SWI_SetTextColour(int number, _kernel_swi_regs *r, void *pw)
+{
+    /* Implements Wimp_SetTextColour */
+    /* => R0 = colour to use in b0-3, set bg flag in b7 */
+    int wimpcolour = r->r[0] & 15;
+    int is_bg = r->r[0] & (1<<7);
+    colour_t col = current_wimp_palette.screen[wimpcolour];
+    dprintf("SetTextColour %i => &%08x\n", wimpcolour, col);
+
+    return _swix(ColourTrans_SetTextColour, _IN(0)| _IN(3), col, is_bg);
+}
+

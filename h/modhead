@@ -65,12 +65,18 @@ _kernel_oserror *Mod_Final(int fatal, int podule_base, void *pw);
  **************************************************************************/
 /* Functions called to handle particular SWI calls */
 _kernel_oserror *SWI_TextOp(int number, _kernel_swi_regs *r, void *pw);
+_kernel_oserror *SWI_SetTextColour(int number, _kernel_swi_regs *r,
+                                   void *pw);
 /* SWI number definitions */
 #define WimpTextRender_00 (0x000c0880)
 #undef WimpTextRender_TextOp
 #undef XWimpTextRender_TextOp
 #define WimpTextRender_TextOp     (0x000c0880)
 #define XWimpTextRender_TextOp    (0x000e0880)
+#undef WimpTextRender_SetTextColour
+#undef XWimpTextRender_SetTextColour
+#define WimpTextRender_SetTextColour  (0x000c0881)
+#define XWimpTextRender_SetTextColour (0x000e0881)
 
 /* Special error for 'SWI values out of range for this module' */
 #define error_BAD_SWI ((_kernel_oserror *) -1)
