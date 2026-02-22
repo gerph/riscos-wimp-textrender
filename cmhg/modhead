@@ -93,7 +93,8 @@ finalisation-code: Mod_Final
 ; register your SWI prefixes when you register a SWI chunk. Each name entry
 ; may be followed by /<entry> to use a particular routine to handle a SWI.
 swi-decoding-table: WimpTextRender TextOp/SWI_TextOp,
-                                   SetTextColour/SWI_SetTextColour
+                                   SetTextColour/SWI_SetTextColour,
+                                   SetFontColours/SWI_SetFontColours
 
 ; The library initialisation code sets up the C environment for use with
 ; this module. You may wish to perform some initialisation prior to the C

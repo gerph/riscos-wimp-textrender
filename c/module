@@ -212,3 +212,33 @@ _kernel_oserror *SWI_SetTextColour(int number, _kernel_swi_regs *r, void *pw)
     return _swix(ColourTrans_SetTextColour, _IN(0)| _IN(3), col, is_bg);
 }
 
+
+
+/***************************************************************************
+ * Description:  SWI handler routine. All SWIs for this module will be
+ *               passed to these routines.
+ * Parameters:   number = SWI number within SWI chunk (i.e. 0 to 63)
+ *               r      = pointer to register block on entry
+ *               pw     = private word for module
+ * On exit:      Return NULL if SWI handled successfully, setting return
+ *               register values (r0-r9) in r.
+ *               Return error_BAD_SWI for out of range SWIs.
+ *               Return an error block for a custom error.
+ **************************************************************************/
+/* Functions called to handle particular SWI calls */
+_kernel_oserror *SWI_SetFontColours(int number, _kernel_swi_regs *r, void *pw)
+{
+    /* Implements Wimp_SetFontColours */
+    /* => R1 = font background wimp colour
+          R2 = font foreground wimp colour
+     */
+    int wimpcolour_bg = r->r[1] & 15;
+    int wimpcolour_fg = r->r[2] & 15;
+    colour_t col_bg = current_wimp_palette.screen[wimpcolour_bg];
+    colour_t col_fg = current_wimp_palette.screen[wimpcolour_fg];
+    dprintf("SetFontColours %i,%i => &%08x,&%08x\n", wimpcolour_bg, wimpcolour_fg, col_bg, col_fg);
+
+    /* 14 means 'anti-alias' these days */
+    return _swix(ColourTrans_SetFontColours, _INR(0, 3), 0, col_bg, col_fg, 14);
+}
+
