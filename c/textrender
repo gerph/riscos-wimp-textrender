@@ -344,7 +344,6 @@ const char *textrender_stringwidthwithsplit(textrender_t *trender, const char *t
         wimpsymbol_string_t wss;
         if (! IS_SYSTEM_FONT(trender))
         {
-            /* FIXME Length not handled in symbol conversion */
             wss = wimpsymbol_convert(text, len,
                                      trender->gcontext->text_readhandle(trender->gcontext, trender->wimpsymbol),
                                      trender->gcontext->text_readhandle(trender->gcontext, trender->font));
