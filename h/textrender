@@ -51,7 +51,8 @@ void textrender_setfont(textrender_t *trender);
  Function:      textrender_setcolours
  Description:   Set the colours for the text rendering (Wimp_TextOp 0-like)
  Parameters:    trender-> the rendering context
-                bg, fg = the colours to use
+                bg = background colour
+                fg = foreground colour
  Returns:       none
  ******************************************************************/
 void textrender_setcolours(textrender_t *trender, colour_t bg, colour_t fg);
@@ -72,8 +73,8 @@ void textrender_readfonthandles(textrender_t *trender, int *desktop_font_handlep
  Parameters:    trender-> the rendering context
                 text-> string to render
                 len = the length to render (or TEXTRENDER_TERM* to use 0-terminated)
-                x = position
-                y = position
+                x = position X
+                y = position Y
  Returns:       none
  ******************************************************************/
 void textrender_paint(textrender_t *trender, const char *text, int len, int x, int y);
@@ -96,7 +97,7 @@ int32_t textrender_stringwidth(textrender_t *trender, const char *text, int len)
                 len = the length of the string (or TEXTRENDER_TERM* for 0-termination)
                 width = the width to split at
                 splitchar = character to split on (or TEXTRENDER_NOSPLIT for none)
- Returns:       split point pointer within the text string.
+ Returns:       split point pointer within the text string
  ******************************************************************/
 const char *textrender_stringwidthwithsplit(textrender_t *trender, const char *text, int len, int32_t width, int splitchar);
 
