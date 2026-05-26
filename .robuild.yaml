@@ -31,11 +31,11 @@ jobs:
 
       - echo
       - echo *** Build the command line test ***
-      - amu -f Makefile install INSTDIR=Install
+      - amu -f MakefileTest install INSTDIR=Install
 
       - echo
       - echo *** Build the test module ***
-      - amu -f MakefileMod ram
+      - amu -f Makefile ram
 
       - echo
       - echo *** Run command to check it doesn't crash ***
