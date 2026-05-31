@@ -274,6 +274,7 @@ void textrender_paint(textrender_t *trender, const char *text, int len, int x, i
         text = wss.string;
         len = wss.len;
     }
+    dprintf("textrender_paint: text='%.*s'\n", len, text);
     trender->gcontext->text_paint(trender->gcontext, trender->font,
                                   x, y, trender->bg, trender->fg,
                                   text, len);
@@ -354,6 +355,7 @@ const char *textrender_stringwidthwithsplit(textrender_t *trender, const char *t
         trender->gcontext->text_getstringsize(trender->gcontext, trender->font,
                                               &bounds, width,
                                               text, len, (splitchar == TEXTRENDER_NOSPLIT) ? GCONTEXT_NOSPLIT : splitchar);
+        //printf("bounds: lbearing=%i, rbearing=%i, xoffset=%i\n", bounds.lbearing, bounds.rbearing, bounds.xoffset);
         if (bounds.rbearing > bounds.xoffset)
             width = bounds.rbearing;
         else
